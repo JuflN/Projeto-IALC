@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow-sm">
-        <div class="row g-0 align-items-start"> <!-- Alinhar ao topo -->
+        <div class="row g-0 align-items-start">
             <div class="col-md-4 d-flex justify-content-center p-3">
                 <img src="{{ url_for('static', filename='capa_provisoria.jpg') }}"
                      alt="Capa do Livro"
@@ -21,9 +21,12 @@
             </div>
         </div>
     </div>
-</div>
-<div class="recommendations-container">
-    <!-- Conteúdo de recomendações aqui -->
-    <button id="voltar" onclick="window.history.back()">Voltar</button>
+    <!-- Coloque o botão fora da div .card para posicioná-lo corretamente -->
+    <button id="voltar" onclick="redirectToChat()">Voltar</button>
+    <script>
+        function redirectToChat() {
+            window.location.href = "{{ url_for('chat') }}";
+        }
+    </script>
 </div>
 {% endblock %}

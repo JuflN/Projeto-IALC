@@ -58,7 +58,7 @@ footer a {
 
 /* Tamanho responsivo para as imagens */
 .img-responsive {
-    max-width: 70%; /* Reduzindo um pouco mais o tamanho máximo */
+    max-width: 120%; /* Reduzindo um pouco mais o tamanho máximo */
     height: auto;
     display: block;
     margin: 0 auto; /* Centraliza a imagem horizontalmente */
@@ -120,37 +120,58 @@ button:hover {
     position: relative;
 }
 
+body {
+    padding-top: 50px; /* Ajuste conforme necessário */
+}
+
+#credits-link {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #6e6e6e; /* Cinza claro */
+    text-decoration: none;
+    font-size: 14px;
+}
+
+#credits-link:hover {
+    color: #333; /* Mais escuro ao passar o mouse */
+}
+
 #voltar {
-    float: right; /* Alinha o botão à direita */
-    background-color: #FF4B4B; /* Exemplo de botão vermelho */
+    position: relative; /* Remove o fixo para acompanhar o conteúdo */
+    display: block;
+    margin: 20px auto; /* Centralizar e ajustar a margem */
+    background-color: #FF4B4B;
     color: white;
-    border: none;
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 20px; /* Margem para descer o botão */
+    border: none;
 }
 
 #voltar:hover {
-    background-color: #FF0000; /* Efeito de hover */
+    background-color: #FF0000;
 }
 
-/* Alinhamento à direita do botão de voltar */
-.container #voltar {
-    float: right;
-}
-
-/* Controle do tamanho da logo do bot */
 #logo-bot {
-    max-width: 150px;  /* Defina um tamanho máximo */
-    height: auto;      /* Mantém a proporção */
-    margin-top: 20px;  /* Adicione um pouco de espaço acima */
+    max-width: 150px; /* Ajuste o tamanho da logo do bot */
+    height: auto;
 }
 
-/* Responsivo para telas menores */
+#logo-ufabc {
+    max-width: 100px; /* Ajuste o tamanho da logo UFABC */
+    height: auto;
+    margin-bottom: 10px; /* Adiciona espaço entre a logo e o rodapé */
+}
+
+/* Ajuste de tamanho para telas menores */
 @media (max-width: 768px) {
     #logo-bot {
-        max-width: 100px; /* Reduza o tamanho para telas menores */
+        max-width: 120px;
+    }
+
+    #logo-ufabc {
+        max-width: 80px;
     }
 }

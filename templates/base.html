@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Book_Bot" class="img-responsive">
-        <h1>Book_Bot</h1>
+    <header class="logo-container">
+        <img id="logo-bot" src="{{ url_for('static', filename='logo.png') }}" alt="Logo BookWormBot" class="img-responsive">
+    {% if show_credits %}
+        <a id="credits-link" href="{{ url_for('credits') }}">Créditos</a>
+    {% endif %}
     </header>
 
     <div class="container">
@@ -18,8 +20,9 @@
     </div>
 
     <footer>
+    {% if show_logo %}
         <img id="logo-ufabc" src="{{ url_for('static', filename='ufabc_logo.png') }}" alt="Logo UFABC" class="img-responsive">
-        <a href="{{ url_for('credits') }}">Créditos</a>
+    {% endif %}
     </footer>
 </body>
 </html>

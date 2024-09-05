@@ -19,8 +19,6 @@ app.secret_key = secrets.token_hex(16)
 # Definir o caminho da fonte TrueType
 font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 
-
-
 #Instalar / Carregar a base de dados
 #file_id = "1enaXPre4GrRN3GYWRMo0tovVE_FyPgu2"
 #url = f"https://drive.google.com/uc?id={file_id}"
@@ -101,7 +99,7 @@ kernel.learn("/home/jufln/Projeto-IALC/book_bot.aiml")
 
 @app.route("/credits")
 def credits():
-    return render_template("credits.html")
+    return render_template("credits.html",show_logo=False, show_credits=False)
 
 @app.route("/", methods=["GET", "POST"])
 def chat():
@@ -167,7 +165,7 @@ def chat():
         else:
             bot_response = response
 
-    return render_template("index.html", bot_response=bot_response)
+    return render_template("index.html", bot_response=bot_response, show_logo=True, show_credits=True)
 
 @app.route("/recommendations")
 def recommendations():
@@ -175,12 +173,13 @@ def recommendations():
                            recommended_title=session.get('recommended_title'),
                            recommended_description=session.get('recommended_description'),
                            wordcloud_path=session.get('wordcloud_path'),
-                           recommended_author=session.get('recommended_author'))
+                           recommended_author=session.get('recommended_author'),
+                           show_logo=True, show_credits=True)
 
 @app.route('/wordcloud')
 def wordcloud():
     # Lógica para exibir a wordcloud
-    return render_template("wordcloud.html")
+    return render_template("wordcloud.html",show_logo=True, show_credits=True)
 
 
 if __name__ == "__main__":

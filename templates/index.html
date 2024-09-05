@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Converse com o Book_Bot</h3>
+
+            <div id="chat-output" class="mb-4">
+                <p>{{ bot_response }}</p>
+            </div>
+
+            <form action="/" method="POST">
+                <div class="mb-3">
+                    <input type="text" name="user_input" id="user-input" class="form-control" placeholder="Digite sua mensagem aqui..." required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

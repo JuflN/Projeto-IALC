@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="row g-0 align-items-start"> <!-- Alinhar ao topo -->
+            <div class="col-md-4 d-flex justify-content-center p-3">
+                <img src="{{ url_for('static', filename='capa_provisoria.jpg') }}" 
+                     alt="Capa do Livro" 
+                     class="img-fluid rounded-start" 
+                     style="max-width: 100%; height: auto;">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title">Recomendação de Livro</h2>
+                    <p class="card-text"><strong>Título:</strong> {{ recommended_title }}</p>
+                    <p class="card-text"><strong>Descrição:</strong> {{ recommended_description }}</p>
+                    <p class="card-text"><strong>Autor:</strong> {{ recommended_author }}</p>
+                    <a href="{{ url_for('wordcloud') }}" class="btn btn-primary mt-3">Visualizar WordCloud</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('chat') }}" class="btn btn-secondary mt-3">Voltar para o Chat</a>
+</div>
+{% endblock %}

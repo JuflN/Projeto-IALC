@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+  <!-- Saudações -->
+  <category>
+    <pattern>OLÁ</pattern>
+    <template>
+      Olá! Eu sou o seu assistente de recomendações de livros.
+      <think>
+        <set name="saudacao">verdadeiro</set>
+      </think>
+      Gostaria de receber uma indicação com base em um livro que você goste?
+    </template>
+  </category>
+
+  <!-- Responder Sim -->
+  <category>
+    <pattern>SIM</pattern>    
+    <template>
+      Qual o nome do livro que você gosta?
+    </template>
+  </category>
+
+  <!-- Capturar nome do livro -->
+  <category>
+    <pattern>*</pattern>
+    <that>QUAL O NOME DO LIVRO QUE VOCÊ GOSTA</that>
+    <template>
+      <think>
+        <set name="livro"><star/></set>
+      </think>
+      Estou procurando o livro "<star/>" no meu banco de dados...
+    </template>
+  </category>
+
+  <!-- Se o livro não for encontrado, pedir descrição -->
+  <category>
+    <pattern>NÃO ENCONTREI O LIVRO *</pattern>
+    <template>
+      Não encontrei o livro no meu banco de dados. Você pode descrever o livro?
+    </template>
+  </category>
+
+  <!-- Capturar descrição do livro -->
+  <category>
+    <pattern>*</pattern>
+    <that>NÃO ENCONTREI O LIVRO *</that>
+    <template>
+      <think>
+        <set name="descricao"><star/></set>
+      </think>
+      Estou procurando recomendações com base na descrição que você forneceu.
+    </template>
+  </category>
+
+  <!-- Mensagem padrão -->
+  <category>
+    <pattern>NÃO</pattern>
+    <template>
+      Tudo bem! Se mudar de ideia, estou por aqui. Posso ajudar com outra coisa?
+    </template>
+  </category>
+
+  <!-- Caso padrão para qualquer outra entrada -->
+  <category>
+    <pattern>*</pattern>
+    <template>
+      Desculpe, não entendi. Você gostaria de receber uma indicação de livro?
+    </template>
+  </category>
+</aiml>

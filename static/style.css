@@ -1,0 +1,156 @@
+/* Aplicando uma nova fonte: Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f7f7; /* Fundo mais claro */
+}
+
+h1, h2, h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.logo-container {
+    text-align: center;
+    margin-top: 20px; /* Para ajustar o espaçamento superior se necessário */
+}
+
+#logo-ufabc {
+    max-width: 100px; /* Ajuste o tamanho máximo da logo se ela estiver muito grande */
+    height: auto;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+footer a {
+    color: #007bff;
+}
+
+/* Tamanho responsivo para as imagens */
+.img-responsive {
+    max-width: 70%; /* Reduzindo um pouco mais o tamanho máximo */
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Centraliza a imagem horizontalmente */
+}
+
+#logo-ufabc {
+    max-width: 80px; /* Diminuindo o tamanho do logo da UFABC */
+    height: auto;
+}
+
+/* Ajustes para telas maiores */
+@media (min-width: 1024px) {
+    .img-responsive {
+        max-width: 150px; /* Ajuste menor para telas maiores */
+    }
+
+    #logo-ufabc {
+        max-width: 110px; /* Ajuste menor para telas maiores */
+    }
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+    .img-responsive {
+        max-width: 50%; /* Redução do tamanho das imagens em telas pequenas */
+    }
+
+    #logo-ufabc {
+        max-width: 70px; /* Redução do logo da UFABC para telas pequenas */
+    }
+}
+
+/* Créditos em cinza médio */
+#credits {
+    color: #6e6e6e; /* Cinza médio */
+}
+
+/* Estilo para os botões */
+button {
+    background-color: #007bff; /* Azul padrão para o botão "Enviar" */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+button:hover {
+    background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+}
+
+.recommendations-container {
+    padding-bottom: 40px; /* Adicione um padding extra na parte inferior */
+    position: relative;
+}
+
+#voltar {
+    float: right; /* Alinha o botão à direita */
+    background-color: #FF4B4B; /* Exemplo de botão vermelho */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px; /* Margem para descer o botão */
+}
+
+#voltar:hover {
+    background-color: #FF0000; /* Efeito de hover */
+}
+
+/* Alinhamento à direita do botão de voltar */
+.container #voltar {
+    float: right;
+}
+
+/* Controle do tamanho da logo do bot */
+#logo-bot {
+    max-width: 150px;  /* Defina um tamanho máximo */
+    height: auto;      /* Mantém a proporção */
+    margin-top: 20px;  /* Adicione um pouco de espaço acima */
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+    #logo-bot {
+        max-width: 100px; /* Reduza o tamanho para telas menores */
+    }
+}

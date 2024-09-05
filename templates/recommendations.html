@@ -5,9 +5,9 @@
     <div class="card shadow-sm">
         <div class="row g-0 align-items-start"> <!-- Alinhar ao topo -->
             <div class="col-md-4 d-flex justify-content-center p-3">
-                <img src="{{ url_for('static', filename='capa_provisoria.jpg') }}" 
-                     alt="Capa do Livro" 
-                     class="img-fluid rounded-start" 
+                <img src="{{ url_for('static', filename='capa_provisoria.jpg') }}"
+                     alt="Capa do Livro"
+                     class="img-fluid rounded-start"
                      style="max-width: 100%; height: auto;">
             </div>
             <div class="col-md-8">
@@ -21,6 +21,9 @@
             </div>
         </div>
     </div>
-    <a href="{{ url_for('chat') }}" class="btn btn-secondary mt-3">Voltar para o Chat</a>
+</div>
+<div class="recommendations-container">
+    <!-- Conteúdo de recomendações aqui -->
+    <button id="voltar" onclick="window.history.back()">Voltar</button>
 </div>
 {% endblock %}

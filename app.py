@@ -5,20 +5,21 @@ from sklearn.metrics.pairwise import cosine_similarity
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 import aiml
-import gdown
-import os
 import secrets
 import unicodedata
 import re
-import gunicorn
-nltk.data.path.append('./nltk_data')
+#nltk.data.path.append('./nltk_data')
 
 
 app = Flask(__name__)
 # Definir a chave secreta
 app.secret_key = secrets.token_hex(16)
+
+# Definir o caminho da fonte TrueType
+font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+
+
 
 #Instalar / Carregar a base de dados
 #file_id = "1enaXPre4GrRN3GYWRMo0tovVE_FyPgu2"
@@ -26,15 +27,23 @@ app.secret_key = secrets.token_hex(16)
 #output = "dados.csv"
 #gdown.download(url, output, quiet=False)
 
-df_total = pd.read_csv("dados.csv")
+def normalize_text(text):
+    # Remover acentos
+    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII')
+    # Converter para minúsculas para uniformidade
+    return text.lower()
+# Preprocessamento
+df_total = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv")
 
 # Filtrando colunas de interesse
 df = df_total[['titulo', 'autor', 'descricao', 'genero', 'male', 'female']]
 
+# Normalizar os títulos no DataFrame para garantir uma comparação justa
+df['normalized_title'] = df['titulo'].apply(normalize_text)
+
 # Garantir que a coluna 'descricao' seja uma string e tratar valores ausentes
 df['descricao'] = df['descricao'].astype(str).fillna('')
 
-# Preprocessamento
 nltk.download('punkt')
 stop_words_portuguese = nltk_stopwords.words('portuguese')
 
@@ -88,7 +97,7 @@ def find_books_based_on_description(user_description, df, top_n=5):
 
 # AIML
 kernel = aiml.Kernel()
-kernel.learn("book_bot.aiml")
+kernel.learn("/home/jufln/Projeto-IALC/book_bot.aiml")
 
 @app.route("/credits")
 def credits():
@@ -101,87 +110,68 @@ def chat():
     if request.method == "POST":
         user_input = request.form.get("user_input", "")
 
-        # Pré-processar a entrada do usuário
-        normalized_input = normalize_input(user_input)
-        
-        # Passar a entrada normalizada para o AIML
+        # Preprocessar a entrada do usuário (normalizar removendo acentos e colocando em minúsculas)
+        normalized_input = normalize_text(user_input)
+
+        # Passar a entrada para o AIML
         response = kernel.respond(normalized_input)
 
-        # Depurar valores dos predicados
-        livro_predicado = kernel.getPredicate("livro")
-        descricao_predicado = kernel.getPredicate("descricao")
-        print(f"Livro Predicado: {livro_predicado}")
-        print(f"Descrição Predicado: {descricao_predicado}")
-
-        # Caso o livro seja fornecido
         if "Estou procurando o livro" in response:
             livro_nome = kernel.getPredicate("livro").lower()
 
-            # Verificar se o livro está no banco de dados
-            if livro_nome in df['titulo'].str.lower().values:
-                livro_descricao = df[df['titulo'].str.lower() == livro_nome]['descricao'].iloc[0]
+            # Verificar se o livro normalizado está no banco de dados com os títulos normalizados
+            if livro_nome in df['normalized_title'].values:
+                livro_descricao = df[df['normalized_title'] == livro_nome]['descricao'].iloc[0]
                 similar_books = find_similar_books(livro_descricao)
-                
-                similar_books = similar_books[similar_books['titulo'].str.lower() != livro_nome]
+                similar_books = similar_books[similar_books['normalized_title'] != livro_nome]
 
                 if not similar_books.empty:
                     recommended_book = similar_books.iloc[0]
-                    session['recommended_title'] = recommended_book['titulo']
+                    session['recommended_title'] = recommended_book['titulo']  # O título original, com acentos
                     session['recommended_description'] = recommended_book['descricao']
                     session['recommended_author'] = recommended_book['autor']
 
-                    wordcloud = WordCloud(stopwords=stop_words_portuguese, background_color="white").generate(recommended_book['cleaned_description'])
-                    wordcloud_path = "static/wordcloud.png"
+                    wordcloud = WordCloud(stopwords=stop_words_portuguese, background_color="white", font_path=font_path).generate(recommended_book['cleaned_description'])
+                    wordcloud_path = "/home/jufln/Projeto-IALC/static/wordcloud.png"
                     wordcloud.to_file(wordcloud_path)
 
                     session['wordcloud_path'] = wordcloud_path
                     return redirect(url_for('recommendations'))
                 else:
-                    bot_response = f"Não encontrei um livro diferente para recomendar com base em '{livro_nome}'."
+                    bot_response = f"Não encontrei um livro para recomendar com base em '{livro_nome}'."
             else:
-                # Se o livro não for encontrado, pedir para o usuário descrever o livro
                 bot_response = f"Não encontrei o livro '{livro_nome}' no meu banco de dados. Você pode descrever o livro para que eu tente recomendar algo similar?"
-                session['esperando_descricao'] = True  # Indicar que estamos esperando a descrição do usuário
+                session['esperando_descricao'] = True
 
-        # Caso o usuário forneça uma descrição após o livro não ser encontrado
         elif session.get('esperando_descricao'):
-            # Se o usuário disser "não", finalizar a conversa
-            if normalized_input.lower() == "não":
-                bot_response = "Tudo bem! Se mudar de ideia, estou por aqui. Volte sempre!"
-                session.pop('esperando_descricao', None)  # Limpar a variável de sessão
-            else:
-                descricao_usuario = normalized_input
+            descricao_usuario = normalized_input
+            if descricao_usuario.strip() != "":
+                similar_books = find_similar_books(descricao_usuario)
+                if not similar_books.empty:
+                    recommended_book = similar_books.iloc[0]
+                    session['recommended_title'] = recommended_book['titulo']  # O título original, com acentos
+                    session['recommended_description'] = recommended_book['descricao']
+                    session['recommended_author'] = recommended_book['autor']
 
-                # Verificação explícita se a descrição não é None e não está vazia
-                if descricao_usuario.strip() != "":
-                    similar_books = find_books_based_on_description(descricao_usuario, df)
+                    wordcloud = WordCloud(stopwords=stop_words_portuguese, background_color="white", font_path=font_path).generate(recommended_book['cleaned_description'])
+                    wordcloud_path = "/home/jufln/Projeto-IALC/static/wordcloud.png"
+                    wordcloud.to_file(wordcloud_path)
 
-                    if not similar_books.empty:
-                        recommended_book = similar_books.iloc[0]
-                        session['recommended_title'] = recommended_book['titulo']
-                        session['recommended_description'] = recommended_book['descricao']
-                        session['recommended_author'] = recommended_book['autor']
-
-                        wordcloud = WordCloud(stopwords=stop_words_portuguese, background_color="white").generate(recommended_book['cleaned_description'])
-                        wordcloud_path = "static/wordcloud.png"
-                        wordcloud.to_file(wordcloud_path)
-
-                        session['wordcloud_path'] = wordcloud_path
-                        session.pop('esperando_descricao', None)  # Limpar a variável de sessão
-                        return redirect(url_for('recommendations'))
-                    else:
-                        bot_response = "Não encontrei livros semelhantes com base na descrição fornecida."
+                    session['wordcloud_path'] = wordcloud_path
+                    session.pop('esperando_descricao', None)
+                    return redirect(url_for('recommendations'))
                 else:
-                    bot_response = "Por favor, descreva o livro para que eu possa buscar algo similar."
+                    bot_response = "Não encontrei livros semelhantes com base na descrição fornecida."
+            else:
+                bot_response = "Por favor, descreva o livro para que eu possa buscar algo similar."
         else:
             bot_response = response
 
-    return render_template("index.html", bot_response=bot_response, wordcloud_path=None)
+    return render_template("index.html", bot_response=bot_response)
 
 @app.route("/recommendations")
 def recommendations():
-    # Aqui é necessário garantir que os dados corretos sejam passados.
-    return render_template("recommendations.html", 
+    return render_template("recommendations.html",
                            recommended_title=session.get('recommended_title'),
                            recommended_description=session.get('recommended_description'),
                            wordcloud_path=session.get('wordcloud_path'),
@@ -194,6 +184,4 @@ def wordcloud():
 
 
 if __name__ == "__main__":
-    if not os.path.exists('static'):
-        os.makedirs('static')
-    app.run(debug=False)
+    app.run()

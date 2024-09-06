@@ -1,24 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h3 class="card-title text-center mb-4">Converse comigo!</h3>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookWormBot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Container principal do chat -->
+    <div class="chat-container">
 
-            <div id="chat-output" class="mb-4">
-                <p>{{ bot_response }}</p>
+        <!-- Cabeçalho do chat -->
+        <div class="chat-header">
+            <div class="title">
+                <img src="{{ url_for('static', filename='bot-avatar.png') }}" alt="Avatar do bot" class="avatar" style="width: 40px; height: 40px; margin-right: 10px;">
+                <span>BookWormBot</span>
             </div>
-
-            <form action="/" method="POST">
-                <div class="mb-3">
-                    <input type="text" name="user_input" id="user-input" class="form-control" placeholder="Digite sua mensagem aqui..." required>
-                </div>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                </div>
-            </form>
+            <div class="status">Online agora</div>
         </div>
+
+        <!-- Caixa de mensagens -->
+        <div class="chat-box" id="chat-box">
+            {% for message in messages %}
+                {% if message['sender'] == 'bot' %}
+                <!-- Mensagem do bot -->
+                <div class="chat-message bot-message">
+                    <img src="{{ url_for('static', filename='bot-avatar.png') }}" alt="Avatar do bot" class="avatar">
+                    <div class="message-content">
+                        {{ message['text'] }}
+                    </div>
+                </div>
+                {% else %}
+                <!-- Mensagem do usuário -->
+                <div class="chat-message user-message">
+                    <div class="message-content">
+                        {{ message['text'] }}
+                    </div>
+                    <img src="{{ url_for('static', filename='user-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Campo de entrada de mensagens -->
+        <form method="POST" action="/">
+            <div class="message-input-container">
+                <input type="text" name="user_input" class="message-input" placeholder="Digite sua mensagem aqui..." autocomplete="off">
+                <button type="submit" class="send-button">Enviar</button>
+            </div>
+        </form>
     </div>
-</div>
+
+    <!-- Créditos fixos no topo -->
+    <a href="{{ url_for('credits') }}" id="credits-link">Créditos</a>
+    <!-- Script para rolar a página para a última mensagem -->
+    <script>
+        function scrollToBottom() {
+            var chatBox = document.getElementById('chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Rolar para a última mensagem ao carregar a página
+        window.onload = function() {
+            scrollToBottom();
+        };
+
+        // Rolar para a última mensagem ao enviar uma mensagem
+        document.getElementById('message-form').onsubmit = function() {
+            setTimeout(scrollToBottom, 100); // Pequeno delay para garantir o carregamento da nova mensagem
+        };
+    </script>
+    <script>
+    // Garantir que o scroll sempre vá para a última mensagem
+    var chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+    </script>
+</body>
 {% endblock %}

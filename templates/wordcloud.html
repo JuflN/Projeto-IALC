@@ -1,14 +1,71 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5 text-center">
+<div class="container mt-5">
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-body text-center">
             <h2 class="card-title mb-4">WordCloud do Livro</h2>
-            <p class="card-text">Uma WordCloud é uma representação visual das palavras mais frequentes em um texto. Quanto maior a palavra, mais vezes ela aparece na descrição do livro. Isso pode ajudar a identificar os temas principais e os tópicos mais discutidos no livro recomendado.</p>
-            <img src="{{ url_for('static', filename='wordcloud.png') }}" alt="WordCloud" class="img-fluid my-4" style="max-width: 100%; height: auto;">
+            <p class="card-text">
+                Uma WordCloud é uma representação visual das palavras mais frequentes em um texto.
+                Quanto maior a palavra, mais vezes ela aparece na descrição do livro.
+                Isso pode ajudar a identificar os temas principais e os tópicos mais discutidos no livro recomendado.
+            </p>
+            <div class="mt-4" style="text-align: center;">
+                <img src="{{ url_for('static', filename='wordcloud.png') }}" alt="WordCloud do Livro" class="img-fluid" style="max-width: 100%; height: auto;">
+            </div>
         </div>
     </div>
+    <button id="voltar" class="btn btn-primary mt-3" onclick="redirectToChat()">Voltar</button>
+        <script>
+        function redirectToChat() {
+            window.location.href = "{{ url_for('chat') }}";
+        }
+        </script>
 </div>
-<button id="voltar" onclick="window.history.back()">Voltar</button>
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .card {
+        background-color: #f9f9f9;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 40px;
+    }
+
+    h2 {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    p {
+        color: #333;
+    }
+
+    /* Botão "Voltar" estilizado */
+    #voltar {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 1.2em;
+        cursor: pointer;
+    }
+
+    #voltar:hover {
+        background-color: #0056b3;
+    }
+
+    /* Estiliza a área para centralizar a logo e alinhar o botão à direita */
+    .d-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
 {% endblock %}

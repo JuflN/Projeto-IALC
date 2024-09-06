@@ -14,7 +14,7 @@
 
   <!-- Responder Sim -->
   <category>
-    <pattern>SIM</pattern>    
+    <pattern>SIM</pattern>
     <template>
       Qual o nome do livro que você gosta?
     </template>

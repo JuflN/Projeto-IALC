@@ -1,28 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Bot</title>
+    <title>BookWormBot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header class="logo-container">
-        <img id="logo-bot" src="{{ url_for('static', filename='logo.png') }}" alt="Logo BookWormBot" class="img-responsive">
-    {% if show_credits %}
-        <a id="credits-link" href="{{ url_for('credits') }}">Créditos</a>
-    {% endif %}
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="BookWormBot Logo" class="img-responsive" style="max-width: 200px; margin: 2px auto; display: block;">
     </header>
 
     <div class="container">
-        <!-- Bloco de conteúdo principal -->
         {% block content %}{% endblock %}
     </div>
 
     <footer>
-    {% if show_logo %}
-        <img id="logo-ufabc" src="{{ url_for('static', filename='ufabc_logo.png') }}" alt="Logo UFABC" class="img-responsive">
-    {% endif %}
+        <!--removi pra ver se fica mais bonito e compacto.
+        {% if show_logo %}
+            <img id="logo-ufabc" src="{{ url_for('static', filename='ufabc_logo.png') }}" alt="Logo UFABC" class="img-responsive" style="max-width: 80px; display: block; margin: 20px auto;">
+        {% endif %}
+         -->
+
+        {% if show_credits %}
+            <a href="{{ url_for('credits') }}" id="credits-link">Créditos</a>
+        {% endif %}
     </footer>
+{% if show_back %}
+    <button id="voltar" onclick="window.history.back()">Voltar</button>
+{% endif %}
+
 </body>
 </html>

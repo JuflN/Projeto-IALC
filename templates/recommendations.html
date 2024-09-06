@@ -1,32 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="row g-0 align-items-start">
-            <div class="col-md-4 d-flex justify-content-center p-3">
-                <img src="{{ url_for('static', filename='capa_provisoria.jpg') }}"
-                     alt="Capa do Livro"
-                     class="img-fluid rounded-start"
-                     style="max-width: 100%; height: auto;">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h2 class="card-title">Recomendação de Livro</h2>
-                    <p class="card-text"><strong>Título:</strong> {{ recommended_title }}</p>
-                    <p class="card-text"><strong>Descrição:</strong> {{ recommended_description }}</p>
-                    <p class="card-text"><strong>Autor:</strong> {{ recommended_author }}</p>
-                    <a href="{{ url_for('wordcloud') }}" class="btn btn-primary mt-3">Visualizar WordCloud</a>
+<div class="chat-container">
+    <!-- Cabeçalho do chat com nome e foto do bot -->
+    <div class="chat-header">
+        <div class="title">
+            <img src="{{ url_for('static', filename='bot-avatar.png') }}" alt="Avatar do bot" class="avatar" style="width: 40px; height: 40px; margin-right: 10px;">
+            <span>BookWormBot</span>
+        </div>
+        <div class="status">Online agora</div>
+    </div>
+
+    <!-- Exibe as mensagens -->
+    <div class="chat-box" id="chat-box">
+        {% for message in messages %}
+            {% if message['sender'] == 'bot' %}
+            <div class="chat-message bot-message">
+                <img src="{{ url_for('static', filename='bot-avatar.png') }}" alt="Avatar do bot" class="avatar">
+                <div class="message-content">
+                    {{ message['text'] | safe }} <!-- O 'safe' permite exibir HTML como a imagem -->
                 </div>
             </div>
-        </div>
+            {% else %}
+            <div class="chat-message user-message">
+                <div class="message-content">
+                    {{ message['text'] }}
+                </div>
+                <img src="{{ url_for('static', filename='user-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
-    <!-- Coloque o botão fora da div .card para posicioná-lo corretamente -->
-    <button id="voltar" onclick="redirectToChat()">Voltar</button>
-    <script>
-        function redirectToChat() {
-            window.location.href = "{{ url_for('chat') }}";
-        }
-    </script>
+
+    <!-- Campo de entrada de mensagens -->
+    <form method="POST" action="/recommendations" id="message-form">
+        <div class="message-input-container">
+            <input type="text" name="user_input" class="message-input" placeholder="Digite sua resposta aqui..." autocomplete="off">
+            <button type="submit" class="send-button">Enviar</button>
+        </div>
+    </form>
 </div>
+
+<!-- Script para redirecionamento após delay -->
+{% if redirect_delay %}
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url_for('chat') }}";
+    }, 3000);  // Redireciona após 3 segundos
+</script>
+{% endif %}
+
+<!-- Script para rolar a página para a última mensagem -->
+<script>
+    function scrollToBottom() {
+        var chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    // Rolar para a última mensagem ao carregar a página
+    window.onload = function() {
+        scrollToBottom();
+    };
+    // Rolar para a última mensagem ao enviar uma mensagem
+    document.getElementById('message-form').onsubmit = function() {
+        setTimeout(scrollToBottom, 100); // Pequeno delay para garantir o carregamento da nova mensagem
+    };
+</script>
 {% endblock %}

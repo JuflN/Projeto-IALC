@@ -1,177 +1,176 @@
-/* Aplicando uma nova fonte: Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
+/* Definições gerais */
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f7f7f7; /* Fundo mais claro */
+    background-color: #f7f7f7;
+    margin: 0;
+    padding-top: 0px; /* Mantém um espaçamento entre o topo da página e o logo */
 }
 
-h1, h2, h3 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    text-align: center;
-    color: #333;
+/* Ajusta o espaçamento abaixo do logo */
+.logo-container {
+    margin-bottom: 10px; /* Reduz o espaço entre o logo e o chat */
+    margin-top: 0px; /* Reduz o espaço entre o topo da página e o logo */
 }
 
-.container {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 30px;
+/* Container do chat */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 500px; /* Reduz o tamanho do chat */
+    margin: 10px auto;
     background-color: #fff;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    height: 450px; /* Define uma altura fixa para o chat */
 }
 
-button {
-    font-family: 'Poppins', sans-serif;
+/* Cabeçalho do chat */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px; /* Reduz o padding no header */
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+}
+
+.title span {
+    font-size: 18px; /* Reduz o tamanho da fonte */
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.status {
+    font-size: 12px; /* Reduz o tamanho da fonte do status */
+    color: green;
+}
+
+/* Caixa de mensagens */
+.chat-box {
+    max-height: 350px; /* Reduz a altura do chat-box para manter mais controle */
+    overflow-y: auto;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Mensagens */
+.chat-message {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Aumenta o espaço entre mensagens */
+}
+
+.bot-message {
+    justify-content: flex-start;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+/* Avatar do bot */
+.bot-message .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Avatar do usuário */
+.user-message .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+/* Conteúdo das mensagens */
+.bot-message .message-content, .user-message .message-content {
+    background-color: #e9e9e9;
+    border-radius: 20px;
+    padding: 10px 15px; /* Ajusta o padding interno das mensagens */
+    max-width: 60%;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Mensagem do usuário */
+.user-message .message-content {
     background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 16px;
+    color: white;
+    border-radius: 20px 20px 0px 20px;
+    text-align: left;
+    max-width: 60%;
+    align-self: flex-end;
+}
+
+/* Campo de entrada de mensagens */
+.message-input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 30px;
+    padding: 8px 12px;  /* Reduz o padding da barra de entrada */
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.message-input {
+    flex: 1;
     border: none;
+    padding: 10px;
+    border-radius: 30px;
+    margin-right: 10px;
+    outline: none;
+}
+
+.send-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
     cursor: pointer;
 }
 
-button:hover {
+.send-button:hover {
     background-color: #0056b3;
 }
 
-.logo-container {
-    text-align: center;
-    margin-top: 20px; /* Para ajustar o espaçamento superior se necessário */
+/* Ajustes de espaçamento nas mensagens */
+.message-content {
+    padding: 10px 15px;
+    border-radius: 20px;
 }
 
-#logo-ufabc {
-    max-width: 100px; /* Ajuste o tamanho máximo da logo se ela estiver muito grande */
-    height: auto;
-}
-
-footer {
-    text-align: center;
-    margin-top: 20px;
-}
-
-footer a {
-    color: #007bff;
-}
-
-/* Tamanho responsivo para as imagens */
-.img-responsive {
-    max-width: 120%; /* Reduzindo um pouco mais o tamanho máximo */
-    height: auto;
-    display: block;
-    margin: 0 auto; /* Centraliza a imagem horizontalmente */
-}
-
-#logo-ufabc {
-    max-width: 80px; /* Diminuindo o tamanho do logo da UFABC */
-    height: auto;
-}
-
-/* Ajustes para telas maiores */
-@media (min-width: 1024px) {
-    .img-responsive {
-        max-width: 150px; /* Ajuste menor para telas maiores */
-    }
-
-    #logo-ufabc {
-        max-width: 110px; /* Ajuste menor para telas maiores */
-    }
-}
-
-/* Ajustes para telas menores */
-@media (max-width: 768px) {
-    .img-responsive {
-        max-width: 50%; /* Redução do tamanho das imagens em telas pequenas */
-    }
-
-    #logo-ufabc {
-        max-width: 70px; /* Redução do logo da UFABC para telas pequenas */
-    }
-}
-
-/* Créditos em cinza médio */
-#credits {
-    color: #6e6e6e; /* Cinza médio */
-}
-
-/* Estilo para os botões */
-button {
-    background-color: #007bff; /* Azul padrão para o botão "Enviar" */
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-button:hover {
-    background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
-}
-
-.recommendations-container {
-    padding-bottom: 40px; /* Adicione um padding extra na parte inferior */
-    position: relative;
-}
-
-body {
-    padding-top: 50px; /* Ajuste conforme necessário */
-}
-
+/* Créditos */
 #credits-link {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
-    color: #6e6e6e; /* Cinza claro */
+    background-color: transparent;
+    color: #6e6e6e;
+    padding: 10px;
     text-decoration: none;
-    font-size: 14px;
 }
 
 #credits-link:hover {
-    color: #333; /* Mais escuro ao passar o mouse */
+    color: #333;
 }
 
-#voltar {
-    position: relative; /* Remove o fixo para acompanhar o conteúdo */
-    display: block;
-    margin: 20px auto; /* Centralizar e ajustar a margem */
-    background-color: #FF4B4B;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-}
-
-#voltar:hover {
-    background-color: #FF0000;
-}
-
-#logo-bot {
-    max-width: 150px; /* Ajuste o tamanho da logo do bot */
-    height: auto;
-}
-
-#logo-ufabc {
-    max-width: 100px; /* Ajuste o tamanho da logo UFABC */
-    height: auto;
-    margin-bottom: 10px; /* Adiciona espaço entre a logo e o rodapé */
-}
-
-/* Ajuste de tamanho para telas menores */
+/* Responsividade para telas menores */
 @media (max-width: 768px) {
-    #logo-bot {
-        max-width: 120px;
-    }
-
-    #logo-ufabc {
-        max-width: 80px;
+    .chat-container {
+        width: 85%;  /* Reduz a largura para dispositivos menores */
+        padding: 10px;
     }
 }

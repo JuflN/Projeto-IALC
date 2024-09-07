@@ -6,42 +6,52 @@ import nltk
 from nltk.corpus import stopwords as nltk_stopwords
 from wordcloud import WordCloud
 import aiml
-import secrets
 import unicodedata
-import re
+import secrets
 
 app = Flask(__name__)
-# Definir a chave secreta
+
+#Configurando chave secreta
 app.secret_key = secrets.token_hex(16)
 
 # Definir o caminho da fonte TrueType
 font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 
-def normalize_text(text):
-    # Remover acentos
-    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII')
-    return text.lower()
-
-# Preprocessamento
-df_total = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv")
-df = df_total[['titulo', 'autor', 'descricao', 'genero', 'male', 'female']]
-
-# Normalizar os títulos no DataFrame
-df.loc[:, 'normalized_title'] = df['titulo'].apply(normalize_text)
-
-# Garantir que a coluna 'descricao' seja uma string e tratar valores ausentes
-df.loc[:, 'descricao'] = df['descricao'].astype(str).fillna('')
-
-nltk.download('punkt')
+# Certificar-se de que as stopwords estão carregadas
+#nltk.download('punkt')
 stop_words_portuguese = nltk_stopwords.words('portuguese')
 
-# Função para preprocessamento
+# Função para normalizar o texto (remover acentos, etc.)
+def normalize_text(text):
+    return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').lower()
+
+# Função para preprocessamento (tokenização, remoção de stopwords e caracteres não alfanuméricos)
 def preprocess(text):
     tokens = nltk.word_tokenize(text.lower())
     tokens = [t for t in tokens if t not in stop_words_portuguese and t.isalnum()]
     return ' '.join(tokens)
 
-df.loc[:, 'cleaned_description'] = df['descricao'].apply(preprocess)
+# Carregar e tratar o DataFrame
+def process_dataframe():
+    df = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv", encoding='utf-8')
+    
+    # Normalizar os títulos no DataFrame
+    df['normalized_title'] = df['titulo'].apply(normalize_text)
+    
+    # Garantir que a coluna 'descricao' seja uma string e tratar valores ausentes
+    df['descricao'] = df['descricao'].astype(str).fillna('')
+    
+    # Preprocessar a descrição para obter a versão "cleaned_description"
+    df['cleaned_description'] = df['descricao'].apply(preprocess)
+    
+    # Retorna o DataFrame tratado
+    return df
+
+# Aplicar o tratamento no DataFrame
+df = process_dataframe()
+
+# Salvar o DataFrame tratado em um novo CSV, se necessário
+df.to_csv("/home/jufln/Projeto-IALC/dados_tratados.csv", index=False, encoding='utf-8')  # Salvar com UTF-8
 
 # TF-IDF
 vectorizer = TfidfVectorizer(stop_words=stop_words_portuguese)

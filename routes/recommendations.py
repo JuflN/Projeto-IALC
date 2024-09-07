@@ -16,7 +16,7 @@ def recommendations():
 
         capa_provisoria = url_for('static', filename='capa_provisoria.jpg')
         capa_message = f"<img src='{capa_provisoria}' alt='Capa do Livro' style='max-width: 200px; height: auto;'/>"
-        capa_message += "<br><b>Se liga na capa!</b>"
+        capa_message += "<br>Se liga na capa!"
         messages.append({'sender': 'bot', 'text': capa_message})
 
         messages.append({'sender': 'bot', 'text': "Quer ver um WordCloud? Responda com 'sim' ou 'não'."})

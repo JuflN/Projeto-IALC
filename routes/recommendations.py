@@ -17,7 +17,10 @@ def recommendations():
             session.get('recommended_author')
         )
         messages.append({'sender': 'bot', 'text': book_details})
-
+        capa_provisoria = url_for('static', filename='capa_provisoria.jpg')
+        capa_message = f"<img src='{capa_provisoria}' alt='Capa do Livro' style='max-width: 200px; height: auto;'/>"
+        capa_message += "<br>Se liga na capa!"
+        messages.append({'sender': 'bot', 'text': capa_message})
         messages.append({'sender': 'bot', 'text': "Quer ver um WordCloud? Responda com 'sim' ou 'não'."})
 
     elif request.method == "POST":
@@ -33,7 +36,7 @@ def recommendations():
 
             generate_wordcloud(session['recommended_description'], font_path, stop_words_portuguese, wordcloud_path)
 
-            messages.append({'sender': 'bot', 'text': f'Aqui está o seu WordCloud: <a href="{url_for("wordcloud_bp.wordcloud")}">Clique aqui para ver</a>'})
+            messages.append({'sender': 'bot', 'text': f'Aqui está o seu WordCloud: <a href="{url_for("wordcloud_bp.wordcloud")}">www.wordcloud.com/bwbot</a>'})
         elif user_input == "não":
             messages.append({'sender': 'bot', 'text': 'Então tchau, até a próxima!'})
             session['messages'] = messages

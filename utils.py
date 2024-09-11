@@ -1,3 +1,5 @@
+from collections import Counter
+import matplotlib.pyplot as plt
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
@@ -43,4 +45,61 @@ def find_similar_books(description, top_n=5):
 def generate_wordcloud(cleaned_description, font_path, stop_words, output_path):
     wordcloud = WordCloud(stopwords=stop_words, background_color="white", font_path=font_path).generate(cleaned_description)
     wordcloud.to_file(output_path)  # Salva o arquivo da wordcloud no caminho especificado
+    return output_path
+
+# Função para gerar histograma
+def generate_histogram(cleaned_description, cleaned_similar_description, stop_words, output_path='histogram.png'):
+
+    # Tokenizar as descrições
+    words_description = cleaned_description.split()
+    words_similar_description = cleaned_similar_description.split()
+
+    # Contar frequências
+    freq_description = Counter(words_description)
+    freq_similar_description = Counter(words_similar_description)
+
+    # Encontrar palavras comuns
+    common_words = set(freq_description.keys()).intersection(set(freq_similar_description.keys()))
+
+    # Criar DataFrame com as palavras comuns e suas frequências
+    data = {
+        'Palavra': list(common_words),
+        'Frequência no Livro Fornecido': [freq_description[word] for word in common_words],
+        'Frequência no Livro Similar': [freq_similar_description[word] for word in common_words]
+    }
+    df_common_words = pd.DataFrame(data)
+
+    # Gerar histograma
+    df_common_words.plot(kind='bar', x='Palavra', figsize=(10, 6))
+    plt.xlabel('Palavra')
+    plt.ylabel('Frequência')
+    plt.title('Frequência de Palavras Comuns')
+    plt.tight_layout()
+
+    # Salvar histograma no caminho especificado
+    plt.savefig(output_path)
+    plt.close()
+
+    return output_path
+
+# Função para gerar gráfico de livros similares
+def generate_graph(description, genre, author, author_pref, top_n, output_path):
+    # Cria um df de livros similares
+    if top_n == None:
+        top_n = 5
+    similar_books = find_similar_books(description, genre, author, author_pref, top_n)
+
+    # Cria um gráfico de barras com os títulos e as similaridades
+    plt.figure(figsize=(10, 6))
+    plt.barh(similar_books['titulo'], similar_books['similaridade'], color='skyblue')
+    plt.xlabel('Similaridade')
+    plt.ylabel('Título')
+    plt.title('Livros Similares')
+    plt.gca().invert_yaxis()
+    plt.tight_layout()
+
+    # Salva o gráfico no caminho especificado
+    plt.savefig(output_path)
+    plt.close()
+
     return output_path

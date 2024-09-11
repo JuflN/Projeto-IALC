@@ -31,7 +31,16 @@ def process_dataframe():
     return df
 
 # Função para encontrar livros semelhantes usando TF-IDF
-def find_similar_books(df, description, genres, author, top_n=5):
+def find_similar_books(df, description, genre, author, author_pref, top_n=5):
+    # Se a preferência do autor for True, filtar apenas livros do mesmo autor
+    if author_pref:
+        df = df[df['normalized_author'] == author]
+
+    # Verificar se o número de livros disponíveis após a filtragem é menor que top_n
+    available_books = len(df)
+    if available_books < top_n:
+        top_n = available_books
+
     # Vetorização TF-IDF das descrições
     vectorizer = TfidfVectorizer(stop_words=stop_words_portuguese)
     tfidf_matrix = vectorizer.fit_transform(df['cleaned_description'])
@@ -41,8 +50,7 @@ def find_similar_books(df, description, genres, author, top_n=5):
     cosine_similarities = cosine_similarity(query_tfidf, tfidf_matrix).flatten()
     
     # Similaridade de gênero (1 se igual, 0 se diferente)
-    genre_similarity = df['normalized_genre'].apply(lambda x: 1 if any(genre in x for genre in genres) else 0)
-
+    genre_similarity = df['normalized_genre'].apply(lambda x: 1 if x == genre else 0)
     #Similaridade de autor (1 se igual, 0 se diferente)
     author_similarity = df['normalized_author'].apply(lambda x: 1 if x == author else 0)
 
@@ -53,6 +61,9 @@ def find_similar_books(df, description, genres, author, top_n=5):
 
     # Similaridade ponderada, futuramente será usada como eixo do histograma
     weighted_similarity = (weight_cosine * cosine_similarities) + (weight_genre * genre_similarity) + (weight_author * author_similarity)
+
+    # Adiciona o coeficiente de similaridade ao df
+    df['similaridade'] = weighted_similarity
 
     # Índices dos livros mais similares
     similar_indices = weighted_similarity.argsort()[-top_n:][::-1]

@@ -48,7 +48,7 @@
       <think>
         <set name="descricao"><star/></set>
       </think>
-      Estou procurando recomendações com base na descrição que você forneceu.
+      Estou procurando recomendações com base na descrição que você forneceu...
     </template>
   </category>
 

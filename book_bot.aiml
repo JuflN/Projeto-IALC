@@ -60,6 +60,68 @@
     </template>
   </category>
 
+  <!-- Livro encontrado -->
+  <category>
+    <pattern>*</pattern>
+    <that>ESTOU PROCURANDO O LIVRO *</that>
+    <template>
+      Encontrei recomendações baseado em "<get name="livro"/>". Aqui estão elas:
+    </template>
+  </category>
+
+  <!--- Pergunta sobre qual livro o usuário deseja saber mais sobre -->
+  <category>
+    <pattern>*</pattern>
+    <that>ENCONTREI RECOMENDAÇÕES BASEADO EM *</that>
+    <template>
+      Qual desses livros você gostaria de saber mais sobre?
+    </template>
+  </category>
+
+  <!-- Capturar escolha do usuário e fornecer descrição-->
+  <category>
+    <pattern>*</pattern>
+    <that>QUAL DESSES LIVROS VOCÊ GOSTARIA DE SABER MAIS SOBRE</that>
+    <template>
+      <think>
+        <set name="escolha"><star/></set>
+      </think>
+      Aqui está a descrição do livro "<get name="escolha"/>":<br/>
+      [Descrição do livro]<br/>
+      Gostaria de saber mais sobre outro livro?
+    </template>
+  </category>
+
+  <!-- Responder Não -->
+  <category>
+    <pattern>NÃO</pattern>
+    <that>GOSTARIA DE SABER MAIS SOBRE OUTRO LIVRO</that>
+    <template>
+      Tudo bem! Se mudar de ideia, estou por aqui. Espero que goste da indicação!
+    </template>
+  </category>
+
+  <!-- Caso o usuário queira saber mais sobre outro livro -->
+  <category>
+    <pattern>SIM</pattern>
+    <that>GOSTARIA DE SABER MAIS SOBRE OUTRO LIVRO</that>
+    <template>
+      Qual o nome do livro que você gostaria de saber mais sobre?
+    </template>
+  </category>
+
+  <!-- Voltando para as indicações -->
+  <category>
+    <pattern>*</pattern>
+    <that>QUAL O NOME DO LIVRO QUE VOCÊ GOSTARIA DE SABER MAIS SOBRE</that>
+    <template>
+      <think>
+        <set name="livro"><star/></set>
+      </think>
+      Estou procurando o livro "<star/>" no meu banco de dados...
+    </template>
+  </category>
+
   <!-- Caso padrão para qualquer outra entrada -->
   <category>
     <pattern>*</pattern>

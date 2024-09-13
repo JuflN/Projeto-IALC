@@ -2,6 +2,7 @@ import pandas as pd
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import unicodedata
 
 # Carregar stopwords
@@ -20,7 +21,7 @@ def preprocess(text):
 
 # Carregar e processar o DataFrame
 def process_dataframe():
-    df = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv", encoding='utf-8')
+    df = pd.read_csv("dados.csv", encoding='utf-8')
     df['normalized_title'] = df['titulo'].apply(normalize_text)
     df['descricao'] = df['descricao'].astype(str).fillna('')
     df['cleaned_description'] = df['descricao'].apply(preprocess)

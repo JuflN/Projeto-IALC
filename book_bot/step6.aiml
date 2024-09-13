@@ -1,14 +1,14 @@
-<?xml version="1.0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <aiml>
     
 <!-- Resposta para qual a descrição: Verificação do step 3 (via python) determinar novo livro na db -->
 <category>
     <pattern>*</pattern>
     <template>
-    <condition name="step" value="7">
+    <condition name="step" value="6">
     <think><set name="descricao"><star/></set></think>
         Parece interessante!
-        <think><set name="step">8</set></think>
+        <think><set name="step">7</set></think>
          Qual é o gênero do livro?
     </condition>
     </template> 

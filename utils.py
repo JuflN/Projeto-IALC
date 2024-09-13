@@ -5,6 +5,7 @@ from wordcloud import WordCloud
 import unicodedata
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -24,7 +25,7 @@ def preprocess(text):
 
 # Função para carregar e preprocessar o DataFrame
 def process_dataframe():
-    df = pd.read_csv("C:/Users/Jufln/Desktop/projeto/Projeto-IALC/dados.csv", encoding='UTF-8', sep=',')
+    df = pd.read_csv("dados.csv", encoding='UTF-8', sep=',')
     df['titulo'] = df['titulo'].fillna('').astype(str)
     df['normalized_title'] = df['titulo'].apply(normalize_text)
     df['descricao'] = df['descricao'].astype(str).fillna('')
@@ -33,21 +34,37 @@ def process_dataframe():
     return df
 
 # Função para calcular a similaridade entre descrições de livros
-def calcular_similaridade(livro_base_descricao, livro_base_autor=None, preferencia_autor=False):
-    df = process_dataframe()
+def calcular_similaridade(livro_base_descricao, livro_base_genero=None, livro_base_autor=None, preferencia_autor=False):
+    """
+    Função para calcular a similaridade entre os livros com base na descrição e aplicar pesos
+    para o mesmo autor. O peso para o gênero será sempre fixo em 10%.
+    """
+    df = process_dataframe()  # Carregar o DataFrame
+
     if livro_base_descricao is None or livro_base_descricao.strip() == "":
         raise ValueError("A descrição do livro base não pode ser None ou vazia.")
 
     descricoes = df['cleaned_description'].tolist()
-    vectorizer = TfidfVectorizer(stop_words=stop_words_portuguese)
-    tfidf_matrix = vectorizer.fit_transform(descricoes + [livro_base_descricao])
-    similaridade = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
 
+    # Vetorização com TF-IDF nas descrições limpas
+    vectorizer = TfidfVectorizer(stop_words=stop_words_portuguese)
+    tfidf_matrix = vectorizer.fit_transform(descricoes + [livro_base_descricao])  # Adiciona a descrição do livro base para a matriz TF-IDF
+    
+    # Calcula a similaridade de todos os livros com a descrição do livro base
+    similaridade = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()  # Calcula com a última linha (livro base)
+
+    # Adicionar peso para o mesmo autor, se aplicável
     if preferencia_autor and livro_base_autor:
         mesmo_autor = df['autor'] == livro_base_autor
-        similaridade += np.where(mesmo_autor, 0.2, 0)
+        similaridade += np.where(mesmo_autor, 0.2, 0)  # Aumenta a similaridade em 20% para o mesmo autor
+
+    # Adicionar peso fixo de 10% para o mesmo gênero, se aplicável
+    if livro_base_genero:
+        mesmo_genero = df['genero'] == livro_base_genero
+        similaridade += np.where(mesmo_genero, 0.1, 0)  # Aumenta a similaridade em 10% para o mesmo gênero
 
     return similaridade
+
 
 # Função para encontrar os livros mais similares
 def find_similar_books(livro_base, existe, same_author=False, descricao=None):
@@ -88,7 +105,7 @@ def gerar_histograma(livros_similares, livro_base):
     plt.gca().invert_yaxis()
     plt.tight_layout()
 
-    hist_dir = r"C:\Users\Jufln\Desktop\projeto\Projeto-IALC\static"
+    hist_dir = r"/static"
     os.makedirs(hist_dir, exist_ok=True)
     hist_path = os.path.join(hist_dir, "histograma.png")
     plt.savefig(hist_path)

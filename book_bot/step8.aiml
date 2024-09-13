@@ -1,13 +1,13 @@
-<?xml version="1.0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <aiml>
     
 <!-- Resposta para qual a o autor: -->
 <category>
     <pattern>*</pattern>
     <template>
-    <condition name="step" value="9">
+    <condition name="step" value="8">
     <think><set name="author_name"><star/></set></think>      
-        Vou me lembrar dele! 
+        Vou me lembrar dele(a)! 
         <think><set name="step">3</set></think>
         Você gostaria de receber recomendações de outros livros do mesmo autor?
     </condition>

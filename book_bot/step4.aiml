@@ -5,7 +5,7 @@
         <pattern>1</pattern>
         <template>
             <condition name="step" value="4">
-                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros.
                 <think><set name="step">0</set></think>
             </condition>
         </template>
@@ -15,7 +15,7 @@
         <pattern>2</pattern>
         <template>
             <condition name="step" value="4">
-                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros.
                 <think><set name="step">0</set></think>
             </condition>
         </template>
@@ -25,7 +25,7 @@
         <pattern>3</pattern>
         <template>
             <condition name="step" value="4">
-                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros.
                 <think><set name="step">0</set></think>
             </condition>
         </template>
@@ -35,7 +35,7 @@
         <pattern>4</pattern>
         <template>
             <condition name="step" value="4">
-                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros.
                 <think><set name="step">0</set></think>
             </condition>
         </template>
@@ -45,7 +45,7 @@
         <pattern>5</pattern>
         <template>
             <condition name="step" value="4">
-                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros.
                 <think><set name="step">0</set></think>
             </condition>
         </template>
@@ -56,6 +56,28 @@
         <template>
             <condition name="step" value="4">
                 Por favor responda apenas um número de 1 a 5.
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern> func TEM SO ESSE FI</pattern>
+        <template>
+            <condition name="step" value="4">
+               Desculpe, só temos esse livro do autor na nossa base de dados.
+               <think><set name="step">5</set></think>
+               Se quiser tentar com outro livro ou autor, me diga qualquer coisa!
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern> func NAO TEM FI</pattern>
+        <template>
+            <condition name="step" value="4">
+               Desculpe, não temos livros do autor na nossa base de dados.
+               <think><set name="step">5</set></think>
+               Se quiser tentar com outro livro ou autor, me diga qualquer coisa!
             </condition>
         </template>
     </category>

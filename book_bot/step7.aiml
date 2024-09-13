@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml>
-    
+
 <!-- Resposta para qual a o autor: -->
 <category>
     <pattern>*</pattern>
     <template>
     <condition name="step" value="7">
-    <think><set name="genre"><star/></set></think>
+    <think><set name="genero"><star/></set></think>
         <think><set name="step">8</set></think>
         Entendi! e quem escreveu essa obra? Se for mais de um autor por favor me diga apenas o principal.
     </condition>
-    </template> 
+    </template>
 </category>
 
 </aiml>

@@ -26,7 +26,7 @@
     <category>
         <pattern>*</pattern>
         <template>
-            <condition name="step" value="4">
+            <condition name="step" value="3">
                 Não entendi, por favor responda com 'sim' ou com 'não'.
             </condition>
         </template>

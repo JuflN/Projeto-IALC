@@ -21,7 +21,7 @@ def preprocess(text):
 
 # Carregar e processar o DataFrame
 def process_dataframe():
-    df = pd.read_csv("dados.csv", encoding='utf-8')
+    df = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv", encoding='utf-8', sep = ',')
     df['normalized_title'] = df['titulo'].apply(normalize_text)
     df['descricao'] = df['descricao'].astype(str).fillna('')
     df['cleaned_description'] = df['descricao'].apply(preprocess)

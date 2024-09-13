@@ -12,7 +12,7 @@
     </category>
 
     <category>
-        <pattern>func encontrei o livro</pattern>
+        <pattern>func ENCONTREI O LIVRO</pattern>
         <template>
 	    <condition name="step" value="2">
                 Econtrei o livro <get name="livro"/>!
@@ -24,7 +24,7 @@
     </category>
 
     <category>
-        <pattern>func nao encontrei o livro</pattern>
+        <pattern>func NAO ENCONTREI O LIVRO</pattern>
         <template>
             <condition name="step" value="2">
                 Não consegui encontrar o livro.

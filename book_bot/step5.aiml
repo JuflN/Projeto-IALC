@@ -7,8 +7,8 @@
             <condition name="step" value="5">
                 Vamos recomeçar!
                 <think><set name="step">2</set></think>
-                Qual é o nome do livro que você gosta e gostaria de ter como base na sua recomendação? 
+                Qual é o nome do livro que você gosta e gostaria de ter como base na sua recomendação?
             </condition>
         </template>
     </category>
-
+</aiml>

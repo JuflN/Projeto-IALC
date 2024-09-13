@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from utils import normalize_text, find_similar_books, process_dataframe
 from aiml_engine import initialize_aiml_engine, load_aiml_for_step
-import time  # Para o delay entre as respostas
 
 chat_bp = Blueprint('chat_bp', __name__)
 
@@ -15,7 +14,6 @@ df = process_dataframe()
 def chat():
     # Limpa a sessão para reiniciar o bot ao acessar a página
     if request.method == "GET":
-        session.clear()
         # Quando o usuário entra pela primeira vez, iniciar o bot com o comando 'INICIAR'
         load_aiml_for_step("1", kernel)
         response = kernel.respond("INICIAR")
@@ -27,8 +25,8 @@ def chat():
 
     # Processa a entrada do usuário
     if request.method == "POST":
-        user_input = request.form.get("user_input", "")
-        normalized_input = normalize_text(user_input)
+        u_input = request.form.get("user_input", "")
+        user_input = normalize_text(u_input)
         session['messages'].append({'sender': 'user', 'text': user_input})
 
         # Obter o step atual do kernel
@@ -38,12 +36,12 @@ def chat():
         load_aiml_for_step(step, kernel)
 
         # Processar a entrada do usuário com AIML
-        response = kernel.respond(normalized_input)
+        response = kernel.respond(user_input)
 
         # Adiciona a resposta do bot às mensagens
         session['messages'].append({'sender': 'bot', 'text': response})
 
-        # **Verificação para o step 2: busca do livro no banco de dados**
+        # Verificação para o step 2: busca do livro no banco de dados
         if "Estou procurando o livro em nossa base de dados..." in response:
             livro_nome = kernel.getPredicate("livro").lower()
 
@@ -51,59 +49,94 @@ def chat():
             matching_books = df[df['normalized_title'] == livro_nome]
             if not matching_books.empty:
                 # Se o livro foi encontrado, continue no step 3
-                response = kernel.respond("func encontrei o livro")
+                response = kernel.respond("func ENCONTREI O LIVRO")
             else:
                 # Se o livro não foi encontrado, continue no step 7
-                response = kernel.respond("func nao encontrei o livro")
+                response = kernel.respond("func NAO ENCONTREI O LIVRO")
             session['messages'].append({'sender': 'bot', 'text': response})
 
-        # **Caso o usuário esteja dando feedback após o step 5**
-        if "Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!" in response:
-            # Adicionar um delay de 3 segundos para mostrar a resposta final
-            time.sleep(3)  # 3 segundos de atraso
+        # Verificação para quando o usuário diz "sim" para querer livros do mesmo autor
+        if "Ótimo! Qual nota você daria para o livro" in response:
+            same_author = int(kernel.getPredicate("same_author"))
+            livro_nome = normalize_text(kernel.getPredicate("livro"))
 
-            # Obter se o livro existe no DataFrame (0 ou 1)
+            if same_author == 1:  # Se o usuário quer livros do mesmo autor
+                matching_books = df[df['normalized_title'] == livro_nome]
+                livro_base_autor = matching_books['autor'].iloc[0]
+                load_aiml_for_step("4", kernel)
+                # Verificar quantos livros do autor existem
+                autor_books = df[df['autor'].str.lower() == livro_base_autor.lower()]
+                if len(autor_books) == 1:
+                    # Informar que há apenas um livro do autor
+                    response = kernel.respond("func TEM SO ESSE FI")
+                    session['messages'].append({'sender': 'bot', 'text': response})
+                    return render_template("index.html", messages=session.get('messages', []), show_logo=True, show_credits=True)
+                elif len(autor_books) == 0:
+                    # Informar que não há livros do autor no DF
+                    response = kernel.respond("func NAO TEM FI")
+                    session['messages'].append({'sender': 'bot', 'text': response})
+                    return render_template("index.html", messages=session.get('messages', []), show_logo=True, show_credits=True)
+                else:
+                    # Continuar com a recomendação de livros do mesmo autor
+                    top_books = autor_books.head(5).to_dict('records')
+                    session['top_books'] = top_books
+
+        # Caso o usuário esteja dando feedback após o step 5
+        if "Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros." in response:
             existe = int(kernel.getPredicate("existe"))
 
-            # Verifica as preferências de autor e gênero
-            same_author = int(kernel.getPredicate("same_author"))
-            same_genre = int(kernel.getPredicate("same_genre"))
-
             if existe == 1:
-                # Se o livro existe no DataFrame
-                livro_nome = normalize_text(kernel.getPredicate("livro"))  # Normalizar o nome do livro
-                matching_books = df[df['normalized_title'] == livro_nome]
-                if not matching_books.empty:
-                    livro_descricao = matching_books['descricao'].iloc[0]  # Obtém a descrição do DataFrame
-                else:
-                    livro_descricao = ""  # Caso o livro exista mas não seja encontrado corretamente
-                livro_genero = matching_books['genero'].iloc[0]  # Obtém o gênero
-            else:
-                # Se o livro não existe, obtém as informações diretamente do AIML
                 livro_nome = normalize_text(kernel.getPredicate("livro"))
-                livro_descricao = kernel.getPredicate("descricao")  # Obtém a descrição fornecida pelo usuário
-                livro_genero = kernel.getPredicate("genre")  # Obtém o gênero fornecido pelo usuário
+                matching_books = df[df['normalized_title'] == livro_nome]
+                livro_descricao = matching_books['descricao'].iloc[0]
+                livro_base_autor = matching_books['autor'].iloc[0]
 
-            # Encontra os 5 livros mais parecidos
-            similar_books = find_similar_books(livro_nome, existe, same_author=same_author, same_genre=same_genre, descricao=livro_descricao, genre=livro_genero)
-            top_books = similar_books.head(5)
+                # Continuar com a recomendação de livros similares
+                similar_books = find_similar_books(livro_nome, existe, same_author=0, descricao=livro_descricao)
+                top_books = similar_books.head(6)
+                # Armazenando apenas os livros, excluindo o próprio livro base
+                # Aplicar a função normalize_text usando lambda corretamente
+                top_books_reduced = top_books.loc[top_books['normalized_title'] != livro_nome, ['titulo', 'autor']].head(5)
 
-            # Passa os 5 livros encontrados para recommendations.py via sessão
-            session['top_books'] = top_books.to_dict('records')  # Converte para uma lista de dicionários
-            session['livro'] = livro_nome  # Passa o nome do livro base para recommendations.py
 
-            # Redireciona para recommendations.py
-            return redirect(url_for('recommendations_bp.recommendations'))
+                # Armazenando apenas título e autor na sessão
+                session['top_books'] = top_books_reduced.to_dict('records')
+                session['livro_nome'] = livro_nome
+                session['livro_autor'] = livro_base_autor
+                session['same_author'] = kernel.getPredicate("same_author")
+                session['messages'].clear()
+                # Redirecionar para recommendations sem passar descrição e gênero, pois o livro está no DataFrame
+                return redirect(url_for('recommendations_bp.recommendations'))
 
-        # **Verificação para quando o usuário fornece uma descrição**
-        if "Por favor me dê uma descrição da história para que eu possa aprender sobre ela." in response:
-            livro_nome = kernel.getPredicate("livro").lower()
-            livro_descricao = kernel.getPredicate("descricao")  # Obtém a descrição fornecida pelo usuário
+            else:
+                # Caso o livro não exista, obter as informações fornecidas pelo usuário
+                livro_nome = normalize_text(kernel.getPredicate("livro"))
+                livro_descricao = kernel.getPredicate("descricao")
+                livro_base_autor = kernel.getPredicate("autor")
+                livro_base_genero = kernel.getPredicate("genero")
 
-            # Se a descrição for dada, continuar o fluxo
-            if livro_descricao:
-                response = kernel.respond("func descricao recebida")
-                session['messages'].append({'sender': 'bot', 'text': response})
+                # Filtrar por autor
+                autor_books = df[df['autor'].str.lower() == livro_base_autor.lower()]
 
-    # Renderiza o template com as mensagens
+                if autor_books.empty:
+                    response = kernel.respond("func NAO TEM FI")
+                    session['messages'].append({'sender': 'bot', 'text': response})
+                elif len(autor_books) == 1:
+                    response = kernel.respond("func TEM SO ESSE FI")
+                    session['messages'].append({'sender': 'bot', 'text': response})
+                else:
+                    # Recomendação para livros do mesmo autor
+                    similar_books = find_similar_books(livro_nome, existe, same_author=1, descricao=livro_descricao)
+                    top_books_reduced = top_books.loc[top_books['normalized_title'] != livro_nome, ['titulo', 'autor']].head(5)
+
+                    # Armazenando apenas título e autor na sessão
+                    session['top_books'] = top_books_reduced.to_dict('records')
+                    session['livro_nome'] = livro_nome
+                    session['livro_autor'] = livro_base_autor
+                    session['same_author'] = kernel.getPredicate("same_author")
+                    session['messages'].clear()
+                    # Redirecionar para recommendations passando descrição e gênero pela URL
+                    return redirect(url_for('recommendations_bp.recommendations', descricao=livro_descricao, genero=livro_base_genero))
+
+
     return render_template("index.html", messages=session.get('messages', []), show_logo=True, show_credits=True)

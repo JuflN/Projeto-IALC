@@ -6,7 +6,7 @@
   <pattern>INICIAR</pattern>
   <template>
     <think><set name="step">1</set></think>
-    Oi! Eu sou o bot BookWorm. Você gostaria de receber uma indicação minha?
+    Oi! Eu sou o bot BookWorm. Você gostaria de receber uma indicação minha? Se quiser sair, digite 'sair' a qualquer momento.
   </template>
 </category>
 
@@ -16,7 +16,8 @@
     <template>
         <condition name="step" value="1">
             <think><set name="step">2</set></think>
-            Obrigado por responder sim! Me diga o nome de um livro que vocÊ gosta e vamos juntos encontrar algo parecido!
+            <think><set name="same_genre">1</set></think>
+            Obrigado por responder sim! Me diga o nome de um livro que você gosta e vamos juntos encontrar algo parecido!
         </condition>
     </template>
 </category>
@@ -26,7 +27,7 @@
     <pattern>nao</pattern>
     <template>
         <condition name="step" value="1">
-            <think><set name="step">1</set></think>
+            <think><set name="step">5</set></think>
             Tudo bem, se precisar é só chamar!
         </condition>
     </template>

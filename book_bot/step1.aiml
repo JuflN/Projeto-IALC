@@ -1,0 +1,46 @@
+<?xml version="1.0.1" encoding="UTF-8"?>
+<aiml>
+
+<!-- Categoria de início -->
+<category>
+  <pattern>INICIAR</pattern>
+  <template>
+    <think><set name="step">1</set></think>
+    Oi! Eu sou o bot BookWorm. Você gostaria de receber uma indicação minha?
+  </template>
+</category>
+
+<!-- Categoria para "sim" no step 1 -->
+<category>
+    <pattern>sim</pattern>
+    <template>
+        <condition name="step" value="1">
+            <think><set name="step">2</set></think>
+            Obrigado por responder sim! Qual é o nome do livro que você gosta e gostaria de ter como base na sua recomendação? 
+        </condition>
+    </template>
+</category>
+
+<!-- Categoria para "não" no step 1 -->
+<category>
+    <pattern>nao</pattern>
+    <template>
+        <condition name="step" value="1">
+            <think><set name="step">1</set></think>
+            Tudo bem, se precisar é só chamar!
+        </condition>
+    </template>
+</category>
+
+<!-- resposta genérica no step 1 -->
+<category>
+    <pattern>*</pattern>
+    <template>
+        <condition name="step" value="1">
+            <think><set name="step">1</set></think>
+            Não entendi, por favor responda sim ou não.
+        </condition>
+    </template>
+</category>
+</aiml>
+

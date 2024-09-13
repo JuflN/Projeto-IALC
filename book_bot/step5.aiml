@@ -1,0 +1,62 @@
+<?xml version="1.0.1" encoding="UTF-8"?>
+<aiml>
+    <!-- Captura a nota do livro no step 5 -->
+    <category>
+        <pattern>1</pattern>
+        <template>
+            <condition name="step" value="5">
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                <think><set name="step">0</set></think>
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>2</pattern>
+        <template>
+            <condition name="step" value="5">
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                <think><set name="step">0</set></think>
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>3</pattern>
+        <template>
+            <condition name="step" value="5">
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                <think><set name="step">0</set></think>
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>4</pattern>
+        <template>
+            <condition name="step" value="5">
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                <think><set name="step">0</set></think>
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>5</pattern>
+        <template>
+            <condition name="step" value="5">
+                Obrigado por sua avaliação! Já tenho as informações necessárias para te indicar livros. Até a próxima!
+                <think><set name="step">0</set></think>
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>*</pattern>
+        <template>
+            <condition name="step" value="5">
+                Por favor responda apenas um número de 1 a 5.
+            </condition>
+        </template>
+    </category>
+</aiml>

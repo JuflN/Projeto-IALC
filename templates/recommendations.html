@@ -45,7 +45,7 @@
 {% if redirect_delay %}
 <script>
     setTimeout(function() {
-        window.location.href = "{{ url_for('chat') }}";
+        window.location.href = "{{ url_for('chat_bp.chat') }}";
     }, 3000);  // Redireciona após 3 segundos
 </script>
 {% endif %}

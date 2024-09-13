@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="card-title mb-4">Histograma de Avaliações</h2>
+            <p class="card-text">
+                Aqui está o histograma das avaliações dos livros recomendados. Isso pode te ajudar a entender melhor a distribuição das notas.
+            </p>
+            <div class="mt-4" style="text-align: center;">
+                <img src="{{ url_for('static', filename='histograma.png') }}" alt="Histograma de Avaliações" class="img-fluid" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+    <button id="voltar" class="btn btn-primary mt-3" onclick="redirectToChat()">Voltar</button>
+    <script>
+        function redirectToChat() {
+            window.location.href = "{{ url_for('chat_bp.chat') }}";
+        }
+    </script>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .card {
+        background-color: #f9f9f9;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 40px;
+    }
+
+    h2 {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    p {
+        color: #333;
+    }
+
+    #voltar {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 1.2em;
+        cursor: pointer;
+    }
+
+    #voltar:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<!-- Script para redirecionamento após delay -->
+{% if redirect_delay %}
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url_for('chat_bp.chat') }}";
+    }, 3000);  // Redireciona após 3 segundos
+</script>
+{% endif %}
+{% endblock %}

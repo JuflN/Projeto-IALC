@@ -1,0 +1,34 @@
+<?xml version="1.0.1" encoding="UTF-8"?>
+<aiml>
+    <!-- Sim ou Não no step 3 -->
+    <category>
+        <pattern>sim</pattern>
+        <template>
+            <condition name="step" value="3">
+                <think><set name="step">4</set></think>
+		<think><set name="same_author">1</set></think>
+                Ótimo! Você também gostaria de receber livros do mesmo gênero?
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>nao</pattern>
+        <template>
+            <condition name="step" value="3">
+                <think><set name="step">4</set></think>
+		<think><set name="same_author">0</set></think>
+                Tudo bem! E sobre o gênero, você gostaria de receber recomendações de livros do mesmo gênero?
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>*</pattern>
+        <template>
+            <condition name="step" value="3">
+                Não Entendi, por favor responda com 'sim' ou 'não'.
+            </condition>
+        </template>
+    </category>
+</aiml>

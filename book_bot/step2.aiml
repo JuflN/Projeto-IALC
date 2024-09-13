@@ -1,0 +1,48 @@
+<?xml version="1.0.1" encoding="UTF-8"?>
+<aiml>
+    <!-- Captura o nome do livro no step 2 -->
+    <category>
+        <pattern>*</pattern>
+        <template>
+            <condition name="step" value="2">
+                <think><set name="livro"><star/></set></think>
+                Estou procurando o livro em nossa base de dados...
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>func encontrei o livro</pattern>
+        <template>
+	    <condition name="step" value="2">
+                Econtrei o livro <get name="livro"/>!
+                <think><set name="step">3</set></think>
+                <think><set name="existe">1</set></think>
+                Você gostaria de receber recomendações de outros livros do mesmo autor?
+            </condition>
+        </template>
+    </category>
+
+    <category>
+        <pattern>func nao encontrei o livro</pattern>
+        <template>
+            <condition name="step" value="2">
+                Não consegui encontrar o livro.
+                <think><set name="step">7</set></think>
+                <think><set name="existe">0</set></think>
+                Por favor me dê uma descrição da história para que eu possa aprender sobre ela.
+            </condition>
+        </template>
+    </category>
+
+        <category>
+        <pattern>func nao encontrei um livro similar</pattern>
+        <template>
+            <condition name="step" value="2">
+                Infelizmente não consegui encontrar indicações para você.
+                <think><set name="step">6</set></think>
+                Se preferir pode pesquisar outro livro. Digite qualquer coisa para reiniciar nossa conversa.
+            </condition>
+        </template>
+    </category>
+</aiml>

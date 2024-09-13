@@ -5,12 +5,12 @@
 <category>
     <pattern>*</pattern>
     <template>
-    <condition name="step" value="8">
-    <think><set name="genre"><star/></set></think>
-        <think><set name="step">9</set></think>
-        Entendi! e quem escreveu essa obra? Se for mais de um autor por favor me diga apenas o principal.
+    <condition name="step" value="9">
+    <think><set name="author_name"><star/></set></think>      
+        Vou me lembrar dele! 
+        <think><set name="step">3</set></think>
+        Você gostaria de receber recomendações de outros livros do mesmo autor?
     </condition>
     </template> 
 </category>
-
 </aiml>

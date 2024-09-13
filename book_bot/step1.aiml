@@ -1,4 +1,4 @@
-<?xml version="1.0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <aiml>
 
 <!-- Categoria de início -->
@@ -16,7 +16,7 @@
     <template>
         <condition name="step" value="1">
             <think><set name="step">2</set></think>
-            Obrigado por responder sim! Qual é o nome do livro que você gosta e gostaria de ter como base na sua recomendação? 
+            Obrigado por responder sim! Me diga o nome de um livro que vocÊ gosta e vamos juntos encontrar algo parecido!
         </condition>
     </template>
 </category>

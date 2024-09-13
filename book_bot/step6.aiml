@@ -1,14 +1,16 @@
 <?xml version="1.0.1" encoding="UTF-8"?>
 <aiml>
-    <!-- Respostas inválidas no step 5 -->
-    <category>
-        <pattern>*</pattern>
-        <template>
-            <condition name="step" value="6">
-                Vamos recomeçar!
-                <think><set name="step">2</set></think>
-                Qual é o nome do livro que você gosta e gostaria de ter como base na sua recomendação? 
-            </condition>
-        </template>
-    </category>
-
+    
+<!-- Resposta para qual a descrição: Verificação do step 3 (via python) determinar novo livro na db -->
+<category>
+    <pattern>*</pattern>
+    <template>
+    <condition name="step" value="7">
+    <think><set name="descricao"><star/></set></think>
+        Parece interessante!
+        <think><set name="step">8</set></think>
+         Qual é o gênero do livro?
+    </condition>
+    </template> 
+</category>
+</aiml>

@@ -18,7 +18,7 @@
                 Econtrei o livro <get name="livro"/>!
                 <think><set name="step">3</set></think>
                 <think><set name="existe">1</set></think>
-                Você gostaria de receber recomendações de outros livros do mesmo autor?
+                Você gostaria de somente receber recomendações de outros livros do mesmo autor?
             </condition>
         </template>
     </category>

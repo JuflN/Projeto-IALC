@@ -1,5 +1,5 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request
-from utils import process_dataframe, gerar_histograma, normalize_text
+from utils import process_dataframe, normalize_text
 
 recommendations_bp = Blueprint('recommendations_bp', __name__)
 
@@ -12,12 +12,12 @@ def recommendations():
 
     # Primeiro, verificamos se a descrição e o gênero foram passados pela URL
     descricao = request.args.get('descricao', None)
-    genero = request.args.get('genero', None)
 
     # Se não recebemos a descrição pela URL, tentamos buscar no DataFrame pelo título e autor
     if not descricao:
         livro_nome = session.get('livro_nome', None)
         livro_autor = session.get('livro_autor', None)
+        genero = session.get('genero', None)
 
         # Certifique-se de que temos o título e autor disponíveis na sessão
         if livro_nome and livro_autor:

@@ -12,22 +12,33 @@ df = process_dataframe()
 
 @chat_bp.route("/", methods=["GET", "POST"])
 def chat():
-    # Limpa a sessão para reiniciar o bot ao acessar a página
-    if request.method == "GET":
-        # Quando o usuário entra pela primeira vez, iniciar o bot com o comando 'INICIAR'
-        load_aiml_for_step("1", kernel)
-        response = kernel.respond("INICIAR")
-        session['messages'] = [{'sender': 'bot', 'text': response}]
 
-    # Inicializa a sessão de mensagens caso ainda não tenha sido feita
+     # Inicializa a sessão de mensagens se ainda não tiver sido feita
     if 'messages' not in session:
         session['messages'] = []
 
+    if request.method == "GET":
+        # Verifica se a lista de mensagens está vazia e se é a primeira visita
+        if not session['messages']:
+            # Quando o usuário entra pela primeira vez, iniciar o bot com o comando 'INICIAR'
+            load_aiml_for_step("1", kernel)
+            response = kernel.respond("INICIAR")
+            session['messages'].append({'sender': 'bot', 'text': response})
+
     # Processa a entrada do usuário
     if request.method == "POST":
+        # Remove a mensagem inicial se for a primeira vez que o POST é recebido
+        if session['messages'] and "Oi! Eu sou o bot BookWorm" in session['messages'][0]['text']:
+            session['messages'].pop(0)
+        # Tratamos a entrada do usuário
         u_input = request.form.get("user_input", "")
         user_input = normalize_text(u_input)
         session['messages'].append({'sender': 'user', 'text': user_input})
+
+        # Verificação para saída do chat/ reinício do bot
+        if user_input == "sair":
+            session.clear()
+            return redirect(url_for('chat_bp.chat'))
 
         # Obter o step atual do kernel
         step = kernel.getPredicate("step")
@@ -60,7 +71,7 @@ def chat():
             same_author = int(kernel.getPredicate("same_author"))
             livro_nome = normalize_text(kernel.getPredicate("livro"))
 
-            if same_author == 1:  # Se o usuário quer livros do mesmo autor
+            if same_author == "1":  # Se o usuário quer livros do mesmo autor
                 matching_books = df[df['normalized_title'] == livro_nome]
                 livro_base_autor = matching_books['autor'].iloc[0]
                 load_aiml_for_step("4", kernel)
@@ -90,6 +101,7 @@ def chat():
                 matching_books = df[df['normalized_title'] == livro_nome]
                 livro_descricao = matching_books['descricao'].iloc[0]
                 livro_base_autor = matching_books['autor'].iloc[0]
+                livro_base_genero = matching_books['genero'].iloc[0]
 
                 # Continuar com a recomendação de livros similares
                 similar_books = find_similar_books(livro_nome, existe, same_author=0, descricao=livro_descricao)
@@ -104,6 +116,7 @@ def chat():
                 session['livro_nome'] = livro_nome
                 session['livro_autor'] = livro_base_autor
                 session['same_author'] = kernel.getPredicate("same_author")
+                session['genero'] = livro_base_genero
                 session['messages'].clear()
                 # Redirecionar para recommendations sem passar descrição e gênero, pois o livro está no DataFrame
                 return redirect(url_for('recommendations_bp.recommendations'))
@@ -134,9 +147,10 @@ def chat():
                     session['livro_nome'] = livro_nome
                     session['livro_autor'] = livro_base_autor
                     session['same_author'] = kernel.getPredicate("same_author")
+                    session['genero'] = livro_base_genero
                     session['messages'].clear()
                     # Redirecionar para recommendations passando descrição e gênero pela URL
-                    return redirect(url_for('recommendations_bp.recommendations', descricao=livro_descricao, genero=livro_base_genero))
+                    return redirect(url_for('recommendations_bp.recommendations', descricao=livro_descricao))
 
 
     return render_template("index.html", messages=session.get('messages', []), show_logo=True, show_credits=True)

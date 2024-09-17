@@ -6,7 +6,7 @@
   <pattern>INICIAR</pattern>
   <template>
     <think><set name="step">1</set></think>
-    Oi! Eu sou o bot BookWorm. Você gostaria de receber uma indicação minha? Se quiser sair, digite 'sair' a qualquer momento.
+    Oi! Eu sou o bot BookWorm. Você gostaria de receber uma indicação minha? Se quiser recomeçar, digite 'sair' a qualquer momento.
   </template>
 </category>
 

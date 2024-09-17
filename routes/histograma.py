@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, request, url_for
+from flask import Blueprint, render_template, request, url_for, session
 from utils import gerar_histograma, process_dataframe, stop_words_portuguese
-from flask import session
 import time
 import os
 

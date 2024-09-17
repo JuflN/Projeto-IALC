@@ -64,8 +64,8 @@ def find_similar_books(livro_base, existe, same_author=False, descricao=None):
         if descricao is None:
             raise ValueError("Descrição é necessária quando o livro não existe no DataFrame.")
         livro_base_descricao = descricao
-        livro_base_genero = session.get('genre', None)
-        livro_base_autor = None
+        livro_base_genero = session.get('genero', None)
+        livro_base_autor = session.get('autor', None)
 
     # Filtra por autor, se necessário
     if same_author and livro_base_autor:

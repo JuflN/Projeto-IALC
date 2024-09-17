@@ -25,6 +25,7 @@ body {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     padding: 10px;
     height: 450px; /* Define uma altura fixa para o chat */
+    box-sizing: border-box; /* Inclui padding e border no cálculo da altura */
 }
 
 /* Cabeçalho do chat */
@@ -55,8 +56,8 @@ body {
 
 /* Caixa de mensagens */
 .chat-box {
-    max-height: 350px; /* Reduz a altura do chat-box para manter mais controle */
-    overflow-y: auto;
+    flex: 1; /* Garante que a caixa de mensagens ocupe o espaço restante */
+    overflow-y: auto; /* Habilita a rolagem vertical */
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;

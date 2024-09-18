@@ -1,9 +1,9 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request
-from utils import process_dataframe, normalize_text
+from utils import normalize_text, get_cached_dataframe
 
 recommendations_bp = Blueprint('recommendations_bp', __name__)
 
-df = process_dataframe()
+df = get_cached_dataframe()
 
 @recommendations_bp.route("/recommendations", methods=["GET", "POST"])
 def recommendations():
@@ -66,7 +66,7 @@ def recommendations():
         if user_input == "sim" and "histogram_choice" in session:
             # Gera o histograma apenas se a descrição estiver disponível
             if descricao:
-                histograma_link = url_for('histograma_bp.histograma')  # Aqui, 'wordcloud_bp.wordcloud' deve corresponder ao nome da rota registrada
+                histograma_link = url_for('histograma_bp.histograma', descricao = descricao)  # Aqui, 'wordcloud_bp.wordcloud' deve corresponder ao nome da rota registrada
                 messages.append({'sender': 'bot', 'text': f"Aqui está o seu histograma: <a href='{histograma_link}'>hist.bookworm.com</a>"})
             else:
                 messages.append({'sender': 'bot', 'text': "Algo deu errado, não foi possível gerar o histograma."})

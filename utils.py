@@ -1,5 +1,6 @@
 import pandas as pd
-from flask import session
+from flask import session, current_app
+from cache_config import cache
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
 from wordcloud import WordCloud
@@ -47,11 +48,24 @@ def process_dataframe():
     # Normalizar a coluna 'genero' (sem modificar o conteúdo, apenas aplicando o normalizer)
     df['genero'] = df['genero'].fillna('').apply(normalize_text)
 
+    # Armazena o dataframe no cache
+    cache.set('process_dataframe', df, timeout=3600)
+
     return df
 
+# Para chamar a df armazenada
+def get_cached_dataframe():
+    # Recuperar o CSV do cache e convertê-lo de volta para DataFrame
+    csv_data = cache.get('process_dataframe')
+    if csv_data is None:
+        df = process_dataframe()
+    else:
+        from io import StringIO
+        df = pd.read_csv(StringIO(csv_data))
+    return df
 
 def find_similar_books(livro_base, existe, same_author=False, descricao=None):
-    df = process_dataframe()  # Carregar o DataFrame
+    df = get_cached_dataframe()  # Carregar o DataFrame
 
     if existe == 1:
         # Livro base existe no DataFrame
@@ -93,14 +107,14 @@ def find_similar_books(livro_base, existe, same_author=False, descricao=None):
 
     return livros_similares
 
+def gerar_histograma(cleaned_description, stop_words, output_path):
 
-def gerar_histograma(cleaned_description, cleaned_similar_description, stop_words, output_path):
     """
-    Função para gerar um histograma de palavras comuns entre a descrição do livro fornecido e a descrição de um livro similar.
+    Função para gerar um histograma de palavras mais comuns entre a descrição do livro fornecido e as descrições dos livros recomendados.
 
     Parâmetros:
     - cleaned_description: Descrição do livro fornecido pelo usuário, já processada.
-    - cleaned_similar_description: Descrição do livro similar encontrado, já processada.
+    - top_books: Lista de dicionários com as descrições dos livros recomendados, cada um deve ter a chave 'cleaned_description'.
     - stop_words: Lista de palavras a serem ignoradas.
     - output_path: Caminho de saída para salvar o histograma.
 
@@ -108,43 +122,64 @@ def gerar_histograma(cleaned_description, cleaned_similar_description, stop_word
     - output_path: Caminho onde o histograma foi salvo.
     """
 
-    # Verifique se o input é uma Series e pegue o primeiro valor se for o caso
-    if isinstance(cleaned_description, pd.Series):
-        cleaned_description = cleaned_description.iloc[0]
-    if isinstance(cleaned_similar_description, pd.Series):
-        cleaned_similar_description = cleaned_similar_description.iloc[0]
+    def remove_stop_words(words, stop_words):
+        """Remove stop words da lista de palavras."""
+        return [word for word in words if word not in stop_words]
 
-    # Tokenizar as descrições
+    # Contar palavras na descrição base
     words_description = cleaned_description.split()
-    words_similar_description = cleaned_similar_description.split()
-
-    # Contar frequências
+    words_description = remove_stop_words(words_description, stop_words)
     freq_description = Counter(words_description)
-    freq_similar_description = Counter(words_similar_description)
 
-    # Encontrar palavras comuns
-    common_words = set(freq_description.keys()).intersection(set(freq_similar_description.keys()))
 
-    # Criar DataFrame com as palavras comuns e suas frequências
+    # Obter 'top_books' da sessão
+    top_books = session.get('top_books', [])
+    if not top_books:
+        print("Nenhum livro encontrado na sessão.")
+        return None
+
+    # Contar palavras nas descrições dos livros recomendados
+    all_words_similar = []
+    for book in top_books:
+        if 'cleaned_description' in book:
+            words_similar = book['cleaned_description'].split()
+            words_similar = remove_stop_words(words_similar, stop_words)
+            all_words_similar.extend(words_similar)
+
+    freq_similar_description = Counter(all_words_similar)
+
+    # Criar DataFrame com as palavras e suas frequências
+    all_common_words = set(freq_description.keys()).union(set(freq_similar_description.keys()))
     data = {
-        'Palavra': list(common_words),
-        'Frequência no Livro Fornecido': [freq_description[word] for word in common_words],
-        'Frequência no Livro Similar': [freq_similar_description[word] for word in common_words]
+        'Palavra': list(all_common_words),
+        'Frequência no Livro Fornecido': [freq_description.get(word, 0) for word in all_common_words],
+        'Frequência nos Livros Recomendados': [freq_similar_description.get(word, 0) for word in all_common_words]
     }
     df_common_words = pd.DataFrame(data)
 
-    # Gerar histograma
-    df_common_words.plot(kind='bar', x='Palavra', figsize=(10, 6))
-    plt.xlabel('Palavra')
-    plt.ylabel('Frequência')
-    plt.title('Frequência de Palavras Comuns')
-    plt.tight_layout()
+    # Verificar se o DataFrame está vazio
+    if df_common_words.empty:
+        print("DataFrame df_common_words está vazio.")
+        return None
 
-    # Salvar histograma no caminho especificado
-    plt.savefig(output_path)
-    plt.close()
+    # Gerar histograma
+    try:
+        plt.figure(figsize=(12, 8))
+        ax = df_common_words.plot(kind='bar', x='Palavra', figsize=(12, 8), title='Frequência de Palavras')
+        plt.xlabel('Palavra')
+        plt.ylabel('Frequência')
+        plt.xticks(rotation=90)
+        plt.tight_layout()
+
+        # Salvar histograma no caminho especificado
+        plt.savefig(output_path)
+        plt.close()
+    except Exception as e:
+        print(f"Erro ao gerar o histograma: {e}")
+        return None
 
     return output_path
+
 
 
 # Função para gerar o WordCloud
@@ -173,7 +208,7 @@ def generate_wordcloud(cleaned_description, stop_words):
 
 
 def calcular_similaridade(livro_base_descricao, livro_base_genero=None, livro_base_autor=None, preferencia_autor=False):
-    df = process_dataframe()  # Carregar o DataFrame
+    df = get_cached_dataframe()  # Carregar o DataFrame
 
     if livro_base_descricao is None or livro_base_descricao.strip() == "":
         raise ValueError("A descrição do livro base não pode ser None ou vazia.")

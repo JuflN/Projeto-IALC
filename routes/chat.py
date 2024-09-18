@@ -10,6 +10,7 @@ kernel = initialize_aiml_engine()
 # Carregar o DataFrame de livros
 df = process_dataframe()
 
+
 @chat_bp.route("/", methods=["GET", "POST"])
 def chat():
 
@@ -71,7 +72,7 @@ def chat():
             same_author = int(kernel.getPredicate("same_author"))
             livro_nome = normalize_text(kernel.getPredicate("livro"))
 
-            if same_author == "1":  # Se o usuário quer livros do mesmo autor
+            if same_author == 1:  # Se o usuário quer livros do mesmo autor
                 matching_books = df[df['normalized_title'] == livro_nome]
                 livro_base_autor = matching_books['autor'].iloc[0]
                 load_aiml_for_step("4", kernel)

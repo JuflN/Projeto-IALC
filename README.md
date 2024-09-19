@@ -1,4 +1,4 @@
-# **BookWorm - Sistema de Recomendação de Livros**
+# **BookWorm - Sistema de Indicação de Livros**
 
 > [!NOTE]  
 > Uma versão mais completa desse texto está no relatório final do projeto.

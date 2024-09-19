@@ -1,5 +1,8 @@
 # **BookWorm - Sistema de Recomendação de Livros**
 
+> [!NOTE]  
+> Uma versão mais completa desse texto está no relatório final do projeto.
+
 ## **Sumário**
 1. [Introdução](#introdução)
 2. [Instalação](#instalação)
@@ -13,7 +16,7 @@
 ---
 
 ## **Introdução**
-Este projeto é um sistema de recomendação de livros que permite aos usuários inserir livros conhecidos ou desconhecidos, gerar recomendações baseadas em similaridade textual (descrição do livro), e visualizar gráficos (histogramas) com livros semelhantes.
+Este projeto é um sistema de indicação de livros que permite aos usuários inserir livros conhecidos ou desconhecidos, gerar indicações baseadas em similaridade textual (descrição do livro), e visualizar gráficos (histogramas) com livros semelhantes.
 
 O sistema usa técnicas de processamento de linguagem natural (NLP), como **TF-IDF** e **similaridade de cosseno** para encontrar livros parecidos, e permite visualizar essas recomendações em um **histograma**.
 
@@ -53,8 +56,8 @@ Para executar o projeto em sua máquina, siga as instruções abaixo:
 ---
 
 ## **Funcionalidades Principais**
-- **Recomendação de Livros**: O usuário pode inserir um livro e receber recomendações baseadas em descrições.
-- **Histograma de Similaridade**: Geração de um gráfico com os livros mais similares ao indicado pelo usuário.
+- **Recomendação de Livros**: O usuário pode inserir um livro e receber indicações baseadas em descrições.
+- **Histograma de Similaridade**: Geração de um histograma com as palavras mais similares entre o livro base e os livros indicados.
 - **Nuvem de Palavras**: Visualização de uma WordCloud com as palavras mais comuns nas descrições de livros.
 - **Filtragem por Autor**: O sistema pode dar preferência a livros do mesmo autor se o usuário desejar.
 
@@ -70,7 +73,7 @@ Este arquivo contém a lógica de interação com o bot de recomendação de liv
 - [Chat.py](./routes/chat.py)
 
 ### **3. `recommendations.py`**
-Gera as recomendações de livros com base no título fornecido pelo usuário. Além disso, permite que o usuário visualize um histograma com os livros mais similares.
+Gera as indicações de livros com base no título fornecido pelo usuário. Além disso, permite que o usuário visualize um histograma com os livros mais similares.
 - [Recommendations.py](./routes/recommendations.py)
 
 ### **4. `utils.py`**
@@ -78,11 +81,11 @@ Arquivo que contém todas as funções principais do projeto, incluindo processa
 - [Utils.py](./utils.py)
 
 ### **5. `wordcloud.py`**
-Gera uma WordCloud com as palavras mais comuns das descrições dos livros recomendados.
+Gera uma WordCloud com as palavras mais comuns das descrições dos livros indicados.
 - [WordCloud.py](./routes/wordcloud.py)
 
 ### **6. `histograma.py`**
-Responsável por gerar o histograma que mostra a similaridade entre os livros recomendados e o livro base.
+Responsável por gerar o histograma que mostra a similaridade entre os livros indicados e o livro base.
 - [Histograma.py](./routes/histograma.py)
 
 ### **7. `dados.csv`**
@@ -103,10 +106,10 @@ Abra o navegador e acesse o seguinte endereço:
 ```
 http://localhost:5000
 ```
-O bot começará perguntando se o usuário deseja uma recomendação de livro. A partir daí, você pode inserir o nome de um livro e seguir o fluxo.
+O bot começará perguntando se o usuário deseja uma indicação de livro. A partir daí, você pode inserir o nome de um livro e seguir o fluxo.
 
 ### **3. Gerar Recomendação**
-Após a interação inicial, o bot gera até 5 recomendações de livros semelhantes. O usuário pode solicitar um histograma de similaridade ou visualizar detalhes sobre um livro específico.
+Após a interação inicial, o bot gera até 5 indicações de livros semelhantes. O usuário pode solicitar um histograma de similaridade ou visualizar detalhes sobre um livro específico.
 
 ### **4. Ver Nuvem de Palavras**
 Depois de selecionar um livro, o bot perguntará se o usuário deseja ver uma WordCloud. Se o usuário aceitar, será gerada uma WordCloud da descrição do livro.

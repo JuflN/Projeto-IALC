@@ -1,5 +1,5 @@
-# app.py
 from flask import Flask
+from flask_session import Session
 from cache_config import cache, init_cache
 import config
 
@@ -8,6 +8,10 @@ app = Flask(__name__)
 
 # Carregar configurações
 app.config.from_object(config.Config)
+
+# Configurar para usar o sistema de arquivos para as sessões (ou Redis, banco de dados, etc.)
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
 # Inicializar o cache
 init_cache(app)

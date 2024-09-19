@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import session, current_app
+from flask import session
 from cache_config import cache
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
@@ -11,6 +11,9 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from collections import Counter
+import json
+import glob
+from tempfile import NamedTemporaryFile
 
 # Carregar as stopwords do português
 stop_words_portuguese = nltk_stopwords.words('portuguese')
@@ -107,16 +110,16 @@ def find_similar_books(livro_base, existe, same_author=False, descricao=None):
 
     return livros_similares
 
-def gerar_histograma(cleaned_description, stop_words, output_path):
-
+def gerar_histograma(cleaned_description, stop_words, top_books, output_path, top_n=20):
     """
     Função para gerar um histograma de palavras mais comuns entre a descrição do livro fornecido e as descrições dos livros recomendados.
 
     Parâmetros:
     - cleaned_description: Descrição do livro fornecido pelo usuário, já processada.
-    - top_books: Lista de dicionários com as descrições dos livros recomendados, cada um deve ter a chave 'cleaned_description'.
     - stop_words: Lista de palavras a serem ignoradas.
+    - top_books: Lista de descrições de livros recomendados.
     - output_path: Caminho de saída para salvar o histograma.
+    - top_n: Número de palavras mais frequentes a exibir (default: 20)
 
     Retorno:
     - output_path: Caminho onde o histograma foi salvo.
@@ -131,20 +134,12 @@ def gerar_histograma(cleaned_description, stop_words, output_path):
     words_description = remove_stop_words(words_description, stop_words)
     freq_description = Counter(words_description)
 
-
-    # Obter 'top_books' da sessão
-    top_books = session.get('top_books', [])
-    if not top_books:
-        print("Nenhum livro encontrado na sessão.")
-        return None
-
     # Contar palavras nas descrições dos livros recomendados
     all_words_similar = []
-    for book in top_books:
-        if 'cleaned_description' in book:
-            words_similar = book['cleaned_description'].split()
-            words_similar = remove_stop_words(words_similar, stop_words)
-            all_words_similar.extend(words_similar)
+    for desc in top_books:
+        words_similar = desc.split()
+        words_similar = remove_stop_words(words_similar, stop_words)
+        all_words_similar.extend(words_similar)
 
     freq_similar_description = Counter(all_words_similar)
 
@@ -152,31 +147,27 @@ def gerar_histograma(cleaned_description, stop_words, output_path):
     all_common_words = set(freq_description.keys()).union(set(freq_similar_description.keys()))
     data = {
         'Palavra': list(all_common_words),
-        'Frequência no Livro Fornecido': [freq_description.get(word, 0) for word in all_common_words],
+        'Frequência no Livro Base': [freq_description.get(word, 0) for word in all_common_words],
         'Frequência nos Livros Recomendados': [freq_similar_description.get(word, 0) for word in all_common_words]
     }
     df_common_words = pd.DataFrame(data)
 
-    # Verificar se o DataFrame está vazio
-    if df_common_words.empty:
-        print("DataFrame df_common_words está vazio.")
-        return None
+    # Ordenar pela soma das frequências e pegar as top N palavras
+    df_common_words['Frequência Total'] = df_common_words.sum(axis=1)
+    df_common_words = df_common_words.nlargest(top_n, 'Frequência Total')
 
     # Gerar histograma
-    try:
-        plt.figure(figsize=(12, 8))
-        ax = df_common_words.plot(kind='bar', x='Palavra', figsize=(12, 8), title='Frequência de Palavras')
-        plt.xlabel('Palavra')
-        plt.ylabel('Frequência')
-        plt.xticks(rotation=90)
-        plt.tight_layout()
+    plt.figure(figsize=(12, 8))
+    df_common_words.plot(kind='bar', x='Palavra', y=['Frequência no Livro Base', 'Frequência nos Livros Recomendados'], figsize=(12, 8))
+    plt.xlabel('Palavra')
+    plt.ylabel('Frequência')
+    plt.title('Frequência de Palavras nos Livros Base e Recomendados')
+    plt.xticks(rotation=90)
+    plt.tight_layout()
 
-        # Salvar histograma no caminho especificado
-        plt.savefig(output_path)
-        plt.close()
-    except Exception as e:
-        print(f"Erro ao gerar o histograma: {e}")
-        return None
+    # Salvar histograma no caminho especificado
+    plt.savefig(output_path)
+    plt.close()
 
     return output_path
 
@@ -233,3 +224,26 @@ def calcular_similaridade(livro_base_descricao, livro_base_genero=None, livro_ba
         similaridade += np.where(mesmo_genero, 0.1, 0)  # Aumenta a similaridade em 10% para o mesmo gênero
 
     return similaridade
+
+def save_books_to_file(books_data):
+    """Salva os dados dos livros em um arquivo temporário e retorna o caminho do arquivo."""
+    with NamedTemporaryFile(delete=False, mode='w', suffix='.json') as temp_file:
+        json.dump(books_data, temp_file)
+        return temp_file.name
+
+def load_books_from_file(file_path):
+    """Carrega os dados dos livros de um arquivo e retorna os dados."""
+    with open(file_path, 'r') as file:
+        return json.load(file)
+
+def clear_temp_files():
+    """
+    Limpa arquivos temporários, como arquivos de recomendação salvos no sistema.
+    """
+    temp_dir = "/path/to/your/temp/directory"
+    temp_files = glob.glob(f"{temp_dir}/*.json")  # Todos os arquivos JSON temporários
+    for file in temp_files:
+        try:
+            os.remove(file)
+        except OSError as e:
+            print(f"Erro ao remover arquivo {file}: {e}")

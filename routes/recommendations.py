@@ -1,32 +1,36 @@
-from flask import Blueprint, session, render_template, redirect, url_for, request
-from utils import normalize_text, get_cached_dataframe
+from flask import Blueprint, render_template, request, url_for, session, redirect
+from utils import get_cached_dataframe, normalize_text, save_books_to_file, load_books_from_file
+import json
 
 recommendations_bp = Blueprint('recommendations_bp', __name__)
 
+# Carregar o DataFrame de livros
 df = get_cached_dataframe()
 
 @recommendations_bp.route("/recommendations", methods=["GET", "POST"])
 def recommendations():
     messages = session.get('messages', [])
-    top_books = session.get('top_books', [])
+    books_file = request.args.get('books_file', None)
+    
+    if books_file:
+        # Carregar os livros do arquivo temporário
+        top_books = load_books_from_file(books_file)
+    else:
+        top_books = []
 
-    # Primeiro, verificamos se a descrição e o gênero foram passados pela URL
     descricao = request.args.get('descricao', None)
 
-    # Se não recebemos a descrição pela URL, tentamos buscar no DataFrame pelo título e autor
     if not descricao:
         livro_nome = session.get('livro_nome', None)
         livro_autor = session.get('livro_autor', None)
         genero = session.get('genero', None)
 
-        # Certifique-se de que temos o título e autor disponíveis na sessão
         if livro_nome and livro_autor:
-            # Procura o livro pelo título normalizado e autor
             matching_books = df[(df['normalized_title'] == livro_nome) & (df['autor'] == livro_autor)]
             if not matching_books.empty:
                 descricao = matching_books['cleaned_description'].iloc[0]
-                session['descricao_base']=descricao
-                genero = matching_books['genero'].iloc[0]  # Garantimos que também buscamos o gênero
+                session['descricao_base'] = descricao
+                genero = matching_books['genero'].iloc[0]
             else:
                 messages.append({'sender': 'bot', 'text': "Não consegui encontrar a descrição do livro no banco de dados."})
         else:
@@ -34,76 +38,72 @@ def recommendations():
 
     if request.method == "GET":
         if top_books:
-            # Exibir os livros recomendados
             messages.append({'sender': 'bot', 'text': "<b>Aqui estão alguns livros que podem te interessar!</b>"})
 
-            # Criar a lista de livros recomendados
+            # Listar os livros recomendados
             book_list = "<br>".join([f"{i+1}. {book['titulo']} - {book['autor']}" for i, book in enumerate(top_books)])
-
-            # Adicionar a lista de livros às mensagens
             messages.append({'sender': 'bot', 'text': book_list})
-
-            # Perguntar se o usuário deseja ver um histograma ou mais detalhes sobre um dos livros
             messages.append({'sender': 'bot', 'text': "Gostaria de ver um histograma de palavras? Se não, me diga qual dos livros acima você gostaria de saber mais sobre."})
 
-            session['histogram_choice'] = True # Define estado para saber que é uma escolha de Histograma
+            session['histogram_choice'] = True
 
     elif request.method == "POST":
         user_input = request.form.get("user_input", "")
         messages.append({'sender': 'user', 'text': user_input})
 
-        # Verificação para saída do chat
         if user_input == "sair":
+            # Limpar arquivos temporários (arquivos de recomendação)
+            clear_temp_files()
+            # Limpar a sessão
             session.clear()
             return redirect(url_for('chat_bp.chat'))
 
-        # Responder "sim" gera o wordcloud
         if user_input == "sim" and "wordcloud_choice" in session:
-            session['descricao_base'] = descricao
             chosen_book = session.get('chosen_book', None)
             return redirect(url_for('wordcloud_bp.wordcloud', book_title=chosen_book))
 
         if user_input == "sim" and "histogram_choice" in session:
-            # Gera o histograma apenas se a descrição estiver disponível
             if descricao:
-                histograma_link = url_for('histograma_bp.histograma', descricao = descricao)  # Aqui, 'wordcloud_bp.wordcloud' deve corresponder ao nome da rota registrada
+                # Pegar as descrições dos livros recomendados
+                top_books_descriptions = [book['cleaned_description'] for book in top_books]
+                top_books_str = json.dumps(top_books_descriptions)
+
+                # Gerar o link do histograma e passar as descrições pela URL
+                histograma_link = url_for('histograma_bp.histograma', descricao=descricao, top_books=top_books_str)
                 messages.append({'sender': 'bot', 'text': f"Aqui está o seu histograma: <a href='{histograma_link}'>hist.bookworm.com</a>"})
             else:
                 messages.append({'sender': 'bot', 'text': "Algo deu errado, não foi possível gerar o histograma."})
-            session.pop("histogram_choice", None)  # Limpa o estado do histograma para o próximo fluxo
+            session.pop("histogram_choice", None)
 
         else:
-            # Verificar se o usuário escolheu um livro da lista
             for book in top_books:
                 if normalize_text(book['titulo']) == normalize_text(user_input):
-
                     respective = df[(df['normalized_title'] == normalize_text(book['titulo'])) & (df['autor'] == book['autor'])]
                     if not respective.empty:
-                        choosen_descricao = respective['descricao'].iloc[0]
+                        chosen_description = respective['descricao'].iloc[0]
 
-                    book_details = f"<b>Título:</b> {book['titulo']}<br><b>Descrição:</b> {choosen_descricao}<br><b>Autor:</b> {book['autor']}"
+                    # Detalhes do livro
+                    book_details = f"<b>Título:</b> {book['titulo']}<br><b>Descrição:</b> {chosen_description}<br><b>Autor:</b> {book['autor']}"
                     messages.append({'sender': 'bot', 'text': book_details})
+                    
+                    # Capa provisória do livro
                     capa_provisoria = url_for('static', filename='capa_provisoria.jpg')
                     capa_message = f"<img src='{capa_provisoria}' alt='Capa do Livro' style='max-width: 200px; height: auto;'/>"
                     capa_message += "<br>Se liga na capa!"
                     messages.append({'sender': 'bot', 'text': capa_message})
 
-                    # Armazena o título e descrição do livro escolhido para o WordCloud
                     session['chosen_book'] = normalize_text(user_input)
-                    session['chosen_description'] = choosen_descricao
-
-                    # Pergunta se o usuário deseja ver o WordCloud
+                    session['chosen_description'] = chosen_description
                     messages.append({'sender': 'bot', 'text': "Gostaria de ver um WordCloud do livro? Digite 'sim' para ver o WordCloud, ou 'não' para voltar ao menu anterior."})
-                    session['wordcloud_choice'] = True  # Define estado para saber que é uma escolha de WordCloud
-                    session['histogram_choice'] = False # Define estado para saber que é uma escolha de WordCloud
+                    session['wordcloud_choice'] = True
+                    session['histogram_choice'] = False
                     break
             else:
                 messages.append({'sender': 'bot', 'text': "Desculpe, não encontrei o livro que você mencionou."})
 
-        # Verifica se o usuário escolheu voltar ao menu
         if user_input == "não":
-            session.pop("wordcloud_choice", None)  # Limpa o estado do WordCloud
+            session.pop("wordcloud_choice", None)
             return redirect(url_for('recommendations_bp.recommendations'))
 
     session['messages'] = messages
-    return render_template("recommendations.html", messages=messages,  show_logo=True, show_credits=True)
+    return render_template("recommendations.html", messages=messages, show_logo=True, show_credits=True)

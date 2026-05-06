@@ -33,9 +33,20 @@ def recommendations():
             messages.append({'sender': 'bot', 'text': "As informações do livro não foram encontradas."})
 
     if request.method == "GET":
-        if top_books:
+        from_page = request.args.get('from')
+
+        if top_books and from_page == "wordcloud":
+            messages.pop()
+            messages.append({
+                'sender': 'bot',
+                'text': "Gostaria de ver um histograma de palavras? Se não, escolha outro livro ou digite 'sair'."
+            })
+            session['histogram_choice'] = True
+            session.pop('wordcloud_choice', None)
+
+        elif top_books and not from_page == "wordcloud":
             # Exibir os livros recomendados
-            messages.append({'sender': 'bot', 'text': "<b>Aqui estão alguns livros que podem te interessar!</b>"})
+            messages.append({'sender': 'bot', 'text': "<b>Aqui estão alguns livros que podem te interessar! Diga o nome do que te interessa saber mais ou 'sair' para encerrar</b>"})
 
             # Criar a lista de livros recomendados
             book_list = "<br>".join([f"{i+1}. {book['titulo']} - {book['autor']}" for i, book in enumerate(top_books)])
@@ -43,10 +54,8 @@ def recommendations():
             # Adicionar a lista de livros às mensagens
             messages.append({'sender': 'bot', 'text': book_list})
 
-            # Perguntar se o usuário deseja ver um histograma ou mais detalhes sobre um dos livros
-            messages.append({'sender': 'bot', 'text': "Gostaria de ver um histograma de palavras? Se não, me diga qual dos livros acima você gostaria de saber mais sobre."})
-
-            session['histogram_choice'] = True # Define estado para saber que é uma escolha de Histograma
+            session.pop('histogram_choice', None)
+            session['wordcloud_choice'] = False  # Define estado para saber que é uma escolha de Histograma
 
     elif request.method == "POST":
         user_input = request.form.get("user_input", "")

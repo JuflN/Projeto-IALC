@@ -10,7 +10,7 @@ def histograma():
 
     descricao_base = request.args.get('descricao', '')
     # Definir o caminho para salvar o histograma
-    output_path = r'/home/jufln/Projeto-IALC/static/histograma.png'
+    output_path = r'Projeto-IALC/static/histograma.png'
 
     # Verificar se o diretório existe e criar, se necessário
     if not os.path.exists(os.path.dirname(output_path)):

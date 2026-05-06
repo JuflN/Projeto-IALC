@@ -18,7 +18,8 @@
     <button id="voltar" class="btn btn-primary mt-3" onclick="redirectToChat()">Voltar</button>
         <script>
         function redirectToChat() {
-            window.location.href = "{{ url_for('recommendations_bp.recommendations') }}";
+            window.location.href = "{{ url_for('recommendations_bp.recommendations') }}?from=wordcloud";
+
         }
         </script>
 </div>

@@ -11,7 +11,7 @@ def wordcloud():
 
     if cleaned_description:
         # Definir caminho para salvar o arquivo da WordCloud
-        #wordcloud_path = os.path.join('static', 'wordcloud.png')
+        wordcloud_path = os.path.join('static', 'wordcloud.png')
 
         # Gerar o WordCloud
         generate_wordcloud(cleaned_description=cleaned_description, stop_words=stop_words_portuguese)

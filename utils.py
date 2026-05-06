@@ -28,7 +28,7 @@ def preprocess(text):
 # Função para carregar e preprocessar o DataFrame
 def process_dataframe():
     # Carregar o DataFrame completo em uma variável temporária
-    temp = pd.read_csv("/home/jufln/Projeto-IALC/dados.csv", encoding='UTF-8', sep=',')
+    temp = pd.read_csv("dados.csv", encoding='UTF-8', sep=',')
 
     # Filtrar apenas as colunas que serão utilizadas
     columns_to_use = ['titulo', 'descricao', 'autor', 'genero']
@@ -55,13 +55,12 @@ def process_dataframe():
 
 # Para chamar a df armazenada
 def get_cached_dataframe():
-    # Recuperar o CSV do cache e convertê-lo de volta para DataFrame
-    csv_data = cache.get('process_dataframe')
-    if csv_data is None:
+    df = cache.get('process_dataframe')
+
+    if df is None:
         df = process_dataframe()
-    else:
-        from io import StringIO
-        df = pd.read_csv(StringIO(csv_data))
+        cache.set('process_dataframe', df)
+
     return df
 
 def find_similar_books(livro_base, existe, same_author=False, descricao=None):
@@ -196,8 +195,8 @@ def generate_wordcloud(cleaned_description, stop_words):
     Retorno:
     - O caminho do arquivo gerado.
     """
-    font_path = r'/home/jufln/Projeto-IALC/static/fonts/Roboto-Regular.ttf'
-    output_path = r'/home/jufln/Projeto-IALC/static/wordcloud.png'
+    font_path = r'static/fonts/Roboto-Regular.ttf'
+    output_path = r'static/wordcloud.png'
 
     if os.path.exists(output_path):
         os.remove(output_path)

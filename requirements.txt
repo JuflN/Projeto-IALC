@@ -1,0 +1,11 @@
+python==3.10
+Flask
+flask_caching
+pandas
+scikit-learn
+nltk
+wordcloud
+matplotlib
+aiml
+gdown
+gunicorn
